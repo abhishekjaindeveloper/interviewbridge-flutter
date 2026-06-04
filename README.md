@@ -1,17 +1,29 @@
-# interview_bridge_app
+# InterviewBridge Backend
 
-A new Flutter project.
+## Project Overview
+InterviewBridge is a production-ready interview management platform.
 
-## Getting Started
+## Tech Stack
+- Java 21
+- Spring Boot
+- Spring Security
+- JWT
+- PostgreSQL
 
-This project is a starting point for a Flutter application.
+## Features
+- Authentication
+- Authorization
+- User Management
+- Validation
+- Global Exception Handling
 
-A few resources to get you started if this is your first Flutter project:
+## Setup
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+```bash
+mvn clean install
+mvn spring-boot:run
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Author
+
+Abhishek Jain
