@@ -9,6 +9,8 @@ abstract class ProfileEvent extends Equatable {
 
 class LoadProfile extends ProfileEvent {}
 
+class ResetProfileState extends ProfileEvent {}
+
 class UpdateProfileRequested extends ProfileEvent {
   final String name;
   final String technologyId;

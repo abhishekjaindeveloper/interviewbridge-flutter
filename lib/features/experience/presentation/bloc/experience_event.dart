@@ -8,3 +8,5 @@ abstract class ExperienceEvent extends Equatable {
 }
 
 class FetchExperiences extends ExperienceEvent {}
+
+class ResetExperienceState extends ExperienceEvent {}

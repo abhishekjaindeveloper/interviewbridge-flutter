@@ -1,9 +1,11 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'dart:developer' as developer;
 import '../../../../core/exceptions/app_exceptions.dart';
 import '../../domain/usecases/get_logged_in_user_usecase.dart';
 import '../../domain/usecases/login_usecase.dart';
 import '../../domain/usecases/logout_usecase.dart';
 import '../../domain/usecases/register_usecase.dart';
+import '../../../../core/constants/app_constants.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
 
@@ -48,7 +50,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } on AppException catch (e) {
       emit(AuthError(e.message));
     } catch (e) {
-      emit(AuthError(e.toString()));
+      developer.log('Error in AuthBloc', error: e);
+      emit(AuthError(AppConstants.errorGeneric));
     }
   }
 
@@ -60,7 +63,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } on AppException catch (e) {
       emit(AuthError(e.message));
     } catch (e) {
-      emit(AuthError(e.toString()));
+      developer.log('Error in AuthBloc', error: e);
+      emit(AuthError(AppConstants.errorGeneric));
     }
   }
 
@@ -72,7 +76,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } on AppException catch (e) {
       emit(AuthError(e.message));
     } catch (e) {
-      emit(AuthError(e.toString()));
+      developer.log('Error in AuthBloc', error: e);
+      emit(AuthError(AppConstants.errorGeneric));
     }
   }
 
@@ -88,7 +93,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } on AppException catch (e) {
       emit(AuthError(e.message));
     } catch (e) {
-      emit(AuthError(e.toString()));
+      developer.log('Error in AuthBloc', error: e);
+      emit(AuthError(AppConstants.errorGeneric));
     }
   }
 }

@@ -8,3 +8,5 @@ abstract class TechnologyEvent extends Equatable {
 }
 
 class FetchTechnologies extends TechnologyEvent {}
+
+class ResetTechnologyState extends TechnologyEvent {}

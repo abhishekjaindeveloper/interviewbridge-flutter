@@ -11,4 +11,5 @@ class RouteConstants {
   static const String sessionActive = '/session-active';
   static const String evaluationResults = '/evaluation-results';
   static const String pendingApproval = '/pending-approval';
+  static const String sessionHistory = '/session-history';
 }

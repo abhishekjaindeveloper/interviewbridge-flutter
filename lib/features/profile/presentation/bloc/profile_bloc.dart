@@ -1,8 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'dart:developer' as developer;
 import '../../../../core/exceptions/app_exceptions.dart';
 import '../../domain/usecases/get_profile_usecase.dart';
 import '../../domain/usecases/update_profile_usecase.dart';
 import '../../domain/usecases/setup_profile_usecase.dart';
+import '../../../../core/constants/app_constants.dart';
 import 'profile_event.dart';
 import 'profile_state.dart';
 
@@ -19,6 +21,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     on<LoadProfile>(_onLoadProfile);
     on<UpdateProfileRequested>(_onUpdateProfileRequested);
     on<SetupProfileSelection>(_onSetupProfileSelection);
+    on<ResetProfileState>((event, emit) => emit(ProfileInitial()));
   }
 
   void _onLoadProfile(
@@ -32,7 +35,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     } on AppException catch (e) {
       emit(ProfileError(e.message));
     } catch (e) {
-      emit(ProfileError(e.toString()));
+      developer.log('Error in ProfileBloc', error: e);
+      emit(ProfileError(AppConstants.errorGeneric));
     }
   }
 
@@ -52,7 +56,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     } on AppException catch (e) {
       emit(ProfileError(e.message));
     } catch (e) {
-      emit(ProfileError(e.toString()));
+      developer.log('Error in ProfileBloc', error: e);
+      emit(ProfileError(AppConstants.errorGeneric));
     }
   }
 
@@ -71,7 +76,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     } on AppException catch (e) {
       emit(ProfileError(e.message));
     } catch (e) {
-      emit(ProfileError(e.toString()));
+      developer.log('Error in ProfileBloc', error: e);
+      emit(ProfileError(AppConstants.errorGeneric));
     }
   }
 }

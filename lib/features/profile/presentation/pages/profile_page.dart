@@ -283,16 +283,44 @@ class _ProfilePageState extends State<ProfilePage> {
                     const SizedBox(height: AppSpacing.xl),
 
                     // Setup/Change Selection Button
-                    CustomButton(
-                      text: isSelectionConfigured
-                          ? AppConstants.changeSelectionButton
-                          : AppConstants.setupSelectionButton,
-                      onPressed: isProfileLoading || isUpdating
-                          ? null
-                          : () {
-                              Navigator.of(context).pushNamed(RouteConstants.profileSetup);
-                            },
-                    ),
+                    if (isSelectionConfigured) ...[
+                      CustomButton(
+                        text: AppConstants.goToPracticeSessionsButton,
+                        onPressed: isProfileLoading || isUpdating
+                            ? null
+                            : () {
+                                Navigator.of(context).pushNamed(RouteConstants.sessionStart);
+                              },
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      OutlinedButton(
+                        onPressed: isProfileLoading || isUpdating
+                            ? null
+                            : () {
+                                Navigator.of(context).pushNamed(RouteConstants.profileSetup);
+                              },
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                          side: const BorderSide(color: AppColors.border),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(AppDimensions.inputRadius),
+                          ),
+                        ),
+                        child: const Text(
+                          AppConstants.changeSelectionButton,
+                          style: TextStyle(color: AppColors.textPrimary),
+                        ),
+                      ),
+                    ] else ...[
+                      CustomButton(
+                        text: AppConstants.setupSelectionButton,
+                        onPressed: isProfileLoading || isUpdating
+                            ? null
+                            : () {
+                                Navigator.of(context).pushNamed(RouteConstants.profileSetup);
+                              },
+                      ),
+                    ],
                   ],
                 ),
               ),

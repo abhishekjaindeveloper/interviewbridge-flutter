@@ -1,7 +1,41 @@
+enum AppEnvironment {
+  development,
+  staging,
+  production,
+}
+
 class ApiConstants {
   ApiConstants._();
 
-  static const String baseUrl = 'http://localhost:8080';
+  static const String _devUrl = 'http://10.237.159.95:9000';
+  static const String _stagingUrl = 'https://staging-api.interviewbridge.com';
+  static const String _prodUrl = 'https://api.interviewbridge.com';
+
+  static AppEnvironment get environment {
+    const envString = String.fromEnvironment('ENV', defaultValue: 'dev');
+    switch (envString.toLowerCase()) {
+      case 'staging':
+        return AppEnvironment.staging;
+      case 'prod':
+      case 'production':
+        return AppEnvironment.production;
+      case 'dev':
+      case 'development':
+      default:
+        return AppEnvironment.development;
+    }
+  }
+
+  static String get baseUrl {
+    switch (environment) {
+      case AppEnvironment.development:
+        return const String.fromEnvironment('API_DEV_URL', defaultValue: _devUrl);
+      case AppEnvironment.staging:
+        return const String.fromEnvironment('API_STAGING_URL', defaultValue: _stagingUrl);
+      case AppEnvironment.production:
+        return const String.fromEnvironment('API_PROD_URL', defaultValue: _prodUrl);
+    }
+  }
 
   // Network Timeouts
   static const Duration connectTimeout = Duration(seconds: 10);
@@ -32,7 +66,14 @@ class ApiConstants {
 
   // Practice Session Endpoints
   static const String practiceSessions = '/api/user/practice-sessions';
+  static String generateQuestionsUrl(String sessionId) => '$practiceSessions/$sessionId/questions/generate';
 
   // Question & Evaluation Endpoints
   static const String practiceQuestions = '/api/user/practice-questions';
+  static String sessionQuestionsUrl(String sessionId) => '$practiceSessions/$sessionId/questions';
+  static String questionByNumberUrl(String sessionId, int num) => '$practiceSessions/$sessionId/questions/$num';
+  static String questionDetailsUrl(String questionId) => '$practiceQuestions/$questionId';
+  static String submitAnswerUrl(String questionId) => '$practiceQuestions/$questionId/answer';
+  static String evaluateQuestionUrl(String questionId) => '$practiceQuestions/$questionId/evaluate';
+  static String questionEvaluationUrl(String questionId) => '$practiceQuestions/$questionId/evaluation';
 }

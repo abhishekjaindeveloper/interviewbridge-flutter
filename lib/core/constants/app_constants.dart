@@ -68,4 +68,86 @@ class AppConstants {
   static const String nameRequired = 'Name is required';
   static const String technologyLabel = 'Technology';
   static const String experienceLevelLabel = 'Experience Level';
+
+  // Practice Session Strings
+  static const String practiceDashboardTitle = 'Practice Dashboard';
+  static const String practiceDashboardSubtitle = 'Configure and start a new interview practice session';
+  static const String startPracticeButton = 'Start Practice Session';
+  static const String goToPracticeSessionsButton = 'Go to Practice Sessions';
+  static const String totalQuestionsSelectorLabel = 'Select Question Count';
+  static const String recentSessionsLabel = 'Recent Sessions Preview';
+  static const String viewAllHistoryButton = 'View All History';
+  static const String noRecentSessionsText = 'No recent practice sessions found.';
+  static const String incompleteProfileWarning = 'Please configure your technology and experience in your profile setup first.';
+  static const String goToProfileSetupButton = 'Go to Profile Setup';
+  static const String practiceSessionCreatedToast = 'Practice session created successfully!';
+  static const String practiceQuestionsGeneratedToast = 'Practice questions generated successfully! Ready for practice.';
+
+  // Session History Strings
+  static const String sessionHistoryTitle = 'Session History';
+  static const String sessionHistorySubtitle = 'Track and review all your past practice sessions';
+  static const String noSessionsFoundText = 'No practice sessions found. Start your first session!';
+  
+  // Session Summary & Card Labels
+  static const String sessionSummaryTitle = 'Session Summary';
+  static const String sessionIdLabel = 'Session ID';
+  static const String completedQuestionsLabel = 'Completed';
+  static const String averageScoreLabel = 'Average Score';
+  static const String statusLabel = 'Status';
+  static const String startedAtLabel = 'Started At';
+  static const String completedAtLabel = 'Completed At';
+  static const String createdAtLabel = 'Created At';
+
+  // Status Labels
+  static const String statusCreated = 'Created';
+  static const String statusInProgress = 'In Progress';
+  static const String statusCompleted = 'Completed';
+  static const String statusUnknown = 'Unknown';
+
+  // Audit Fix Constants
+  static const String totalQuestionsLabel = 'Total Questions';
+  static const String completedQuestionsLabelDetailed = 'Completed Questions';
+  static const String readyForPracticeTitle = 'Ready for Practice';
+  static const String closeButton = 'Close';
+  static const String activeSelectionsTitle = 'Active Selections';
+  static const String notAvailablePlaceholder = 'N/A';
+  static const List<int> questionCountPresets = [5, 10, 15, 20];
+
+  // Question Module UI Strings
+  static const String questionPageTitle = 'Question Page';
+  static const String resumeSessionSub = 'Resuming Practice Session';
+  static const String previousQuestionButton = 'Previous';
+  static const String nextQuestionButton = 'Next';
+  static const String submitAnswerButton = 'Submit Answer';
+  static const String finishViewEvaluationButton = 'Finish & View Evaluation';
+  static const String answerInputPlaceholder = 'Enter your answer here...';
+  static const String answerRequiredMsg = 'Answer cannot be empty';
+  static const String duplicateSubmissionWarning = 'Duplicate submission prevented';
+  static const String questionsCompletedBannerTitle = 'All questions completed!';
+  static const String completedQuestionsProgressLabel = 'Completed Questions Progress';
+  static const String questionStatusAnswered = 'Answered';
+  static const String questionStatusPending = 'Pending';
+  static const String questionStatusSkipped = 'Skipped';
+  static const String emptyQuestionsText = 'No questions available for this session.';
+  static const String answerSubmittedToast = 'Answer submitted successfully!';
+  static const String proceedToEvaluationPrompt = 'Proceed to view the session evaluations.';
+  static const String answerTooLongMsg = 'Answer cannot exceed 5000 characters';
+
+  // Evaluation Screen Strings
+  static const String evaluationPageTitle = 'AI Evaluation & Feedback';
+  static const String evaluateButton = 'Evaluate Answer';
+  static const String evaluatingStatus = 'AI is evaluating your response...';
+  static const String userAnswerTitle = 'Your Answer';
+  static const String translatedAnswerTitle = 'Translated Answer';
+  static const String improvedAnswerTitle = 'Suggested Improvement';
+  static const String explanationTitle = 'AI Feedback & Explanation';
+  static const String notEvaluatedYet = 'Not Evaluated Yet';
+  static const String evaluationCompleted = 'Evaluation Completed';
+  static const String evaluationFailed = 'Evaluation Failed';
+  static const String noEvaluationAvailable = 'No evaluation available for this question.';
+  static const String scoreLabel = 'Score';
+  static const String scoreOutOfTen = '/ 10';
+  static const String backToHistoryButton = 'Back to Session History';
+  static const String closeSessionButton = 'Finish Session';
+  static const String triggerEvaluationTooltip = 'Evaluate answer using AI';
 }

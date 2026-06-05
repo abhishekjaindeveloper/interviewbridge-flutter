@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import '../../features/auth/presentation/pages/auth_wrapper.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/profile/presentation/pages/technology_experience_selection_page.dart';
+import '../../features/practice_session/presentation/pages/practice_session_page.dart';
+import '../../features/practice_session/presentation/pages/session_history_page.dart';
+import '../../features/question/presentation/pages/question_page.dart';
+import '../../features/evaluation/presentation/pages/evaluation_page.dart';
 import 'route_constants.dart';
 
 class AppRouter {
@@ -27,25 +31,32 @@ class AppRouter {
           settings: settings,
           builder: (_) => const TechnologyExperienceSelectionPage(),
         );
+      case RouteConstants.sessionStart:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const PracticeSessionPage(),
+        );
+      case RouteConstants.sessionHistory:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const SessionHistoryPage(),
+        );
       case RouteConstants.adminDashboard:
         return MaterialPageRoute(
           settings: settings,
           builder: (_) => const Scaffold(body: Center(child: Text('Admin Dashboard Screen'))),
         );
-      case RouteConstants.sessionStart:
-        return MaterialPageRoute(
-          settings: settings,
-          builder: (_) => const Scaffold(body: Center(child: Text('Start Session Screen'))),
-        );
       case RouteConstants.sessionActive:
+        final sessionId = settings.arguments as String;
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) => const Scaffold(body: Center(child: Text('Active Session Screen'))),
+          builder: (_) => QuestionPage(sessionId: sessionId),
         );
       case RouteConstants.evaluationResults:
+        final sessionId = settings.arguments as String;
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) => const Scaffold(body: Center(child: Text('Evaluation Results Screen'))),
+          builder: (_) => EvaluationPage(sessionId: sessionId),
         );
       default:
         return MaterialPageRoute(
