@@ -6,6 +6,7 @@ import '../bloc/auth_state.dart';
 import 'login_page.dart';
 import 'pending_approval_page.dart';
 import '../../../profile/presentation/pages/profile_page.dart';
+import '../../../admin/presentation/pages/admin_dashboard_page.dart';
 import '../../../practice_session/presentation/bloc/practice_session_bloc.dart';
 import '../../../practice_session/presentation/bloc/practice_session_event.dart';
 import '../../../question/presentation/bloc/question_bloc.dart';
@@ -18,6 +19,8 @@ import '../../../technology/presentation/bloc/technology_bloc.dart';
 import '../../../technology/presentation/bloc/technology_event.dart';
 import '../../../experience/presentation/bloc/experience_bloc.dart';
 import '../../../experience/presentation/bloc/experience_event.dart';
+import '../../../../core/constants/app_constants.dart';
+import '../../../../core/widgets/error_dialog.dart';
 import '../../../../core/widgets/loading_indicator.dart';
 
 class AuthWrapper extends StatefulWidget {
@@ -45,6 +48,16 @@ class _AuthWrapperState extends State<AuthWrapper> {
           context.read<ProfileBloc>().add(ResetProfileState());
           context.read<TechnologyBloc>().add(ResetTechnologyState());
           context.read<ExperienceBloc>().add(ResetExperienceState());
+        } else if (state is AuthError) {
+          final isNetworkError = state.message == AppConstants.noConnection;
+          ErrorDialog.show(
+            context: context,
+            title: isNetworkError
+                ? AppConstants.dialogTitleNetworkError
+                : AppConstants.dialogTitleAuthError,
+            message: state.message,
+            type: DialogType.error,
+          );
         }
       },
       builder: (context, state) {
@@ -55,6 +68,9 @@ class _AuthWrapperState extends State<AuthWrapper> {
         } else if (state is Authenticated) {
           if (state.user.approvalStatus == 'PENDING') {
             return const PendingApprovalPage();
+          }
+          if (state.user.role == 'ROLE_ADMIN') {
+            return const AdminDashboardPage();
           }
           return const ProfilePage();
         } else {

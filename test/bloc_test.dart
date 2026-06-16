@@ -2,11 +2,21 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:interview_bridge_app/core/exceptions/app_exceptions.dart';
 import 'package:interview_bridge_app/features/technology/domain/entities/technology_entity.dart';
 import 'package:interview_bridge_app/features/technology/domain/usecases/get_technologies_usecase.dart';
+import 'package:interview_bridge_app/features/technology/domain/usecases/get_all_technologies_usecase.dart';
+import 'package:interview_bridge_app/features/technology/domain/usecases/create_technology_usecase.dart';
+import 'package:interview_bridge_app/features/technology/domain/usecases/update_technology_usecase.dart';
+import 'package:interview_bridge_app/features/technology/domain/usecases/activate_technology_usecase.dart';
+import 'package:interview_bridge_app/features/technology/domain/usecases/deactivate_technology_usecase.dart';
 import 'package:interview_bridge_app/features/technology/presentation/bloc/technology_bloc.dart';
 import 'package:interview_bridge_app/features/technology/presentation/bloc/technology_event.dart';
 import 'package:interview_bridge_app/features/technology/presentation/bloc/technology_state.dart';
 import 'package:interview_bridge_app/features/experience/domain/entities/experience_entity.dart';
 import 'package:interview_bridge_app/features/experience/domain/usecases/get_experiences_usecase.dart';
+import 'package:interview_bridge_app/features/experience/domain/usecases/get_all_experiences_usecase.dart';
+import 'package:interview_bridge_app/features/experience/domain/usecases/create_experience_usecase.dart';
+import 'package:interview_bridge_app/features/experience/domain/usecases/update_experience_usecase.dart';
+import 'package:interview_bridge_app/features/experience/domain/usecases/activate_experience_usecase.dart';
+import 'package:interview_bridge_app/features/experience/domain/usecases/deactivate_experience_usecase.dart';
 import 'package:interview_bridge_app/features/experience/presentation/bloc/experience_bloc.dart';
 import 'package:interview_bridge_app/features/experience/presentation/bloc/experience_event.dart';
 import 'package:interview_bridge_app/features/experience/presentation/bloc/experience_state.dart';
@@ -48,6 +58,60 @@ class MockGetExperiencesUseCase implements GetExperiencesUseCase {
     }
     return result ?? [];
   }
+}
+
+class MockGetAllTechnologiesUseCase implements GetAllTechnologiesUseCase {
+  @override
+  Future<List<TechnologyEntity>> call() async => [];
+}
+
+class MockCreateTechnologyUseCase implements CreateTechnologyUseCase {
+  @override
+  Future<TechnologyEntity> call(String name, String description) async => 
+      const TechnologyEntity(id: '', name: '', description: '');
+}
+
+class MockUpdateTechnologyUseCase implements UpdateTechnologyUseCase {
+  @override
+  Future<TechnologyEntity> call(String id, String name, String description) async => 
+      const TechnologyEntity(id: '', name: '', description: '');
+}
+
+class MockActivateTechnologyUseCase implements ActivateTechnologyUseCase {
+  @override
+  Future<void> call(String id) async {}
+}
+
+class MockDeactivateTechnologyUseCase implements DeactivateTechnologyUseCase {
+  @override
+  Future<void> call(String id) async {}
+}
+
+class MockGetAllExperiencesUseCase implements GetAllExperiencesUseCase {
+  @override
+  Future<List<ExperienceEntity>> call() async => [];
+}
+
+class MockCreateExperienceUseCase implements CreateExperienceUseCase {
+  @override
+  Future<ExperienceEntity> call(String label) async => 
+      const ExperienceEntity(id: '', experienceLabel: '');
+}
+
+class MockUpdateExperienceUseCase implements UpdateExperienceUseCase {
+  @override
+  Future<ExperienceEntity> call(String id, String label) async => 
+      const ExperienceEntity(id: '', experienceLabel: '');
+}
+
+class MockActivateExperienceUseCase implements ActivateExperienceUseCase {
+  @override
+  Future<void> call(String id) async {}
+}
+
+class MockDeactivateExperienceUseCase implements DeactivateExperienceUseCase {
+  @override
+  Future<void> call(String id) async {}
 }
 
 class MockGetProfileUseCase implements GetProfileUseCase {
@@ -103,7 +167,14 @@ void main() {
 
     setUp(() {
       mockGetTechnologies = MockGetTechnologiesUseCase();
-      bloc = TechnologyBloc(getTechnologiesUseCase: mockGetTechnologies);
+      bloc = TechnologyBloc(
+        getTechnologiesUseCase: mockGetTechnologies,
+        getAllTechnologiesUseCase: MockGetAllTechnologiesUseCase(),
+        createTechnologyUseCase: MockCreateTechnologyUseCase(),
+        updateTechnologyUseCase: MockUpdateTechnologyUseCase(),
+        activateTechnologyUseCase: MockActivateTechnologyUseCase(),
+        deactivateTechnologyUseCase: MockDeactivateTechnologyUseCase(),
+      );
     });
 
     test('initial state should be TechnologyInitial', () {
@@ -144,7 +215,14 @@ void main() {
 
     setUp(() {
       mockGetExperiences = MockGetExperiencesUseCase();
-      bloc = ExperienceBloc(getExperiencesUseCase: mockGetExperiences);
+      bloc = ExperienceBloc(
+        getExperiencesUseCase: mockGetExperiences,
+        getAllExperiencesUseCase: MockGetAllExperiencesUseCase(),
+        createExperienceUseCase: MockCreateExperienceUseCase(),
+        updateExperienceUseCase: MockUpdateExperienceUseCase(),
+        activateExperienceUseCase: MockActivateExperienceUseCase(),
+        deactivateExperienceUseCase: MockDeactivateExperienceUseCase(),
+      );
     });
 
     test('initial state should be ExperienceInitial', () {

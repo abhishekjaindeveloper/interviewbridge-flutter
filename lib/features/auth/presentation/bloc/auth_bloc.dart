@@ -26,6 +26,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<RegisterRequested>(_onRegisterRequested);
     on<LogoutRequested>(_onLogoutRequested);
     on<LoadCurrentUser>(_onLoadCurrentUser);
+    on<ClearRegistrationState>(_onClearRegistrationState);
   }
 
   void _onAuthStarted(AuthStarted event, Emitter<AuthState> emit) async {
@@ -58,7 +59,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   void _onRegisterRequested(RegisterRequested event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
-      final user = await registerUseCase(event.name, event.email, event.password);
+      final user = await registerUseCase(
+        event.name,
+        event.email,
+        event.phoneNumber,
+        event.password,
+        event.termsAccepted,
+      );
       emit(Authenticated(user));
     } on AppException catch (e) {
       emit(AuthError(e.message));
@@ -95,6 +102,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } catch (e) {
       developer.log('Error in AuthBloc', error: e);
       emit(AuthError(AppConstants.errorGeneric));
+    }
+  }
+
+  void _onClearRegistrationState(ClearRegistrationState event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+    try {
+      await logoutUseCase();
+      emit(Unauthenticated());
+    } catch (e) {
+      developer.log('Error clearing registration state', error: e);
+      emit(Unauthenticated());
     }
   }
 }

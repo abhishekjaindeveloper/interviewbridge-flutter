@@ -7,7 +7,7 @@ enum AppEnvironment {
 class ApiConstants {
   ApiConstants._();
 
-  static const String _devUrl = 'http://10.237.159.95:9000';
+  static const String _devUrl = 'http://10.11.8.94:9000';
   static const String _stagingUrl = 'https://staging-api.interviewbridge.com';
   static const String _prodUrl = 'https://api.interviewbridge.com';
 

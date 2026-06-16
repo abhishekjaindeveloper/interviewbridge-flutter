@@ -20,6 +20,54 @@ class ExperienceRepositoryImpl implements ExperienceRepository {
     }
   }
 
+  @override
+  Future<List<ExperienceEntity>> getAllExperiences() async {
+    try {
+      final models = await _remoteDataSource.getAllExperiences();
+      return models.map((model) => model.toEntity()).toList();
+    } on DioException catch (e) {
+      throw _mapDioException(e);
+    }
+  }
+
+  @override
+  Future<ExperienceEntity> createExperience(String label) async {
+    try {
+      final model = await _remoteDataSource.createExperience(label);
+      return model.toEntity();
+    } on DioException catch (e) {
+      throw _mapDioException(e);
+    }
+  }
+
+  @override
+  Future<ExperienceEntity> updateExperience(String id, String label) async {
+    try {
+      final model = await _remoteDataSource.updateExperience(id, label);
+      return model.toEntity();
+    } on DioException catch (e) {
+      throw _mapDioException(e);
+    }
+  }
+
+  @override
+  Future<void> activateExperience(String id) async {
+    try {
+      await _remoteDataSource.activateExperience(id);
+    } on DioException catch (e) {
+      throw _mapDioException(e);
+    }
+  }
+
+  @override
+  Future<void> deactivateExperience(String id) async {
+    try {
+      await _remoteDataSource.deactivateExperience(id);
+    } on DioException catch (e) {
+      throw _mapDioException(e);
+    }
+  }
+
   AppException _mapDioException(DioException e) {
     if (e.type == DioExceptionType.connectionTimeout ||
         e.type == DioExceptionType.sendTimeout ||

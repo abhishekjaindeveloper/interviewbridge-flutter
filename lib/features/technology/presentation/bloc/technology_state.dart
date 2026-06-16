@@ -29,3 +29,12 @@ class TechnologyError extends TechnologyState {
   @override
   List<Object?> get props => [message];
 }
+
+class TechnologyActionSuccess extends TechnologyState {
+  final String message;
+
+  const TechnologyActionSuccess(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}

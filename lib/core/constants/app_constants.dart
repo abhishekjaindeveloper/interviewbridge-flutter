@@ -20,6 +20,8 @@ class AppConstants {
   static const String registerLink = 'Register';
   static const String emailLabel = 'Email Address';
   static const String emailHint = 'Enter your email';
+  static const String emailOrPhoneLabel = 'Email or Phone Number';
+  static const String emailOrPhoneHint = 'Enter your email or phone number';
   static const String passwordLabel = 'Password';
   static const String passwordHint = 'Enter your password';
 
@@ -30,6 +32,8 @@ class AppConstants {
   static const String loginLink = 'Login';
   static const String fullNameLabel = 'Full Name';
   static const String fullNameHint = 'Enter your full name';
+  static const String phoneNumberLabel = 'Phone Number';
+  static const String phoneNumberHint = 'Enter your phone number';
   static const String confirmPasswordLabel = 'Confirm Password';
   static const String confirmPasswordHint = 'Confirm your password';
 
@@ -37,6 +41,37 @@ class AppConstants {
   static const String pendingSubtitle = 'Your account registration has been submitted and is currently pending administrator approval. You will receive access once approved.';
   static const String logoutButton = 'Logout';
   static const String passwordsDoNotMatch = 'Passwords do not match';
+  static const String okButton = 'OK';
+
+  // Admin Dashboard Strings
+  static const String adminDashboardTitle = 'Admin Panel';
+  static const String menuDashboard = 'Dashboard';
+  static const String menuPendingUsers = 'Pending Users';
+  static const String menuTechnologyMaster = 'Technology Master';
+  static const String menuExperienceMaster = 'Experience Master';
+  static const String menuProfile = 'Profile';
+  static const String menuLogout = 'Logout';
+  static const String placeholderDashboard = 'Admin Dashboard Overview Placeholder';
+  static const String placeholderPendingUsers = 'Pending User Approvals List Placeholder';
+  static const String placeholderTechnologyMaster = 'Technology Master CRUD Placeholder';
+  static const String placeholderExperienceMaster = 'Experience Master CRUD Placeholder';
+  static const String placeholderProfile = 'Admin Profile Placeholder';
+
+  // Dialog Titles
+  static const String dialogTitleError = 'Error';
+  static const String dialogTitleSuccess = 'Success';
+  static const String dialogTitleWarning = 'Warning';
+  static const String dialogTitleInfo = 'Information';
+  static const String dialogTitleNetworkError = 'Network Error';
+  static const String dialogTitleAuthError = 'Authentication Failure';
+  static const String dialogTitleValidationError = 'Validation Failed';
+  static const String dialogTitleServerError = 'Server Error';
+  
+  // Login Error Messages
+  static const String errorPendingApproval = 'Your account is pending admin approval. Please wait for approval before logging in.';
+  static const String errorRejected = 'Your account has been rejected. Please contact the administrator.';
+  static const String errorInvalidCredentials = 'Invalid email or password.';
+  static const String errorDisabledAccount = 'Your account is currently inactive.';
 
   // Profile Strings
   static const String profileTitle = 'User Profile';
@@ -150,4 +185,82 @@ class AppConstants {
   static const String backToHistoryButton = 'Back to Session History';
   static const String closeSessionButton = 'Finish Session';
   static const String triggerEvaluationTooltip = 'Evaluate answer using AI';
+
+  // Splash & Landing Screen Strings
+  static const String splashTagline = 'Practice. Improve. Get Hired.';
+  static const String landingTitle = 'InterviewBridge';
+  static const String landingHeroTitle = 'Master Your Next Technical Interview';
+  static const String landingHeroSubtitle = 'Get instant AI feedback, practice real-world questions tailored to your technology and experience level, and track your progress.';
+  static const String featuresTitle = 'Core Features';
+  static const String featureAiEvalTitle = 'AI Interview Evaluation';
+  static const String featureAiEvalDesc = 'Get deep insights, detailed explanations, and instant scores for your answers.';
+  static const String featurePracticeTitle = 'Practice Sessions';
+  static const String featurePracticeDesc = 'Simulate real interviews with customizable question sets tailored to your stack.';
+  static const String featureTrackingTitle = 'Progress Tracking';
+  static const String featureTrackingDesc = 'Monitor your performance over time and see how your scores improve.';
+  static const String featureFeedbackTitle = 'Personalized Feedback';
+  static const String featureFeedbackDesc = 'Receive translated answers and custom suggestions to elevate your responses.';
+  static const String getStartedButton = 'Get Started';
+  static const String landingLoginButton = 'Login';
+
+  // Terms & Privacy Policy Strings
+  static const String termsAgreementPrefix = 'I agree to the ';
+  static const String termsConditionsLabel = 'Terms & Conditions';
+  static const String privacyPolicyLabel = 'Privacy Policy';
+  static const String termsConditionsTitle = 'Terms & Conditions';
+  static const String privacyPolicyTitle = 'Privacy Policy';
+  static const String termsConditionsText = 'Welcome to InterviewBridge. By registering and using our app, you agree to comply with our Terms & Conditions. You agree to use the service for personal growth, AI interview simulation, and professional skill enhancement. We reserve the right to suspend accounts violating acceptable use rules or behaving disruptively. All AI generated content is provided as-is without legal warranty.';
+  static const String privacyPolicyText = 'Your privacy matters to us at InterviewBridge. We collect minimal personal credentials (name, email, and optionally phone number) strictly for user authentication, record mapping, and AI evaluations. Your inputs, generated questions, and feedback logs are securely cached and are not shared with unauthorized third-party commercial marketing systems.';
+
+  // Admin User Management Strings
+  static const String adminConfirmActionTitle = 'Confirm Action';
+  static const String adminApproveConfirmMsg = 'Are you sure you want to approve this user?';
+  static const String adminRejectConfirmMsg = 'Are you sure you want to reject this user?';
+  static const String adminNoPendingUsers = 'No pending users found.';
+  static const String adminLoadPendingFailed = 'Failed to load pending users.';
+  static const String adminRetryButton = 'Retry';
+  static const String adminConfirmButton = 'Confirm';
+  static const String adminCancelButton = 'Cancel';
+  static const String adminApproveButton = 'Approve';
+  static const String adminRejectButton = 'Reject';
+  static const String adminRegistrationDateLabel = 'Registration Date';
+
+  // Admin Master CRUD Strings
+  static const String techMasterTitle = 'Technology Master';
+  static const String techNameLabel = 'Technology Name';
+  static const String techDescLabel = 'Description';
+  static const String techStatusLabel = 'Status';
+  static const String addTechTitle = 'Add Technology';
+  static const String editTechTitle = 'Edit Technology';
+  static const String techCreateSuccess = 'Technology created successfully.';
+  static const String techUpdateSuccess = 'Technology updated successfully.';
+  static const String techActivateSuccess = 'Technology activated successfully.';
+  static const String techDeactivateSuccess = 'Technology deactivated successfully.';
+  static const String techActivateConfirmMsg = 'Are you sure you want to activate this technology?';
+  static const String techDeactivateConfirmMsg = 'Are you sure you want to deactivate this technology?';
+  static const String techNameRequired = 'Technology name is required.';
+  static const String techLoadFailed = 'Failed to load technologies.';
+  static const String techNoRecords = 'No technologies found.';
+
+  static const String expMasterTitle = 'Experience Master';
+  static const String expLabelLabel = 'Experience Label';
+  static const String addExpTitle = 'Add Experience Level';
+  static const String editExpTitle = 'Edit Experience Level';
+  static const String expCreateSuccess = 'Experience level created successfully.';
+  static const String expUpdateSuccess = 'Experience level updated successfully.';
+  static const String expActivateSuccess = 'Experience level activated successfully.';
+  static const String expDeactivateSuccess = 'Experience level deactivated successfully.';
+  static const String expActivateConfirmMsg = 'Are you sure you want to activate this experience level?';
+  static const String expDeactivateConfirmMsg = 'Are you sure you want to deactivate this experience level?';
+  static const String expLabelRequired = 'Experience label is required.';
+  static const String expLoadFailed = 'Failed to load experience levels.';
+  static const String expNoRecords = 'No experience levels found.';
+
+  static const String statusActive = 'Active';
+  static const String statusInactive = 'Inactive';
+  static const String btnSave = 'Save';
+  static const String btnCreate = 'Create';
+  static const String btnActivate = 'Activate';
+  static const String btnDeactivate = 'Deactivate';
+  static const String searchPlaceholder = 'Search...';
 }

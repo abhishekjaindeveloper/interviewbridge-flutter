@@ -10,7 +10,9 @@ abstract class AuthRemoteDataSource {
   Future<RegisterResponseModel> register(
     String name,
     String email,
+    String phoneNumber,
     String password,
+    bool termsAccepted,
   );
 }
 
@@ -33,11 +35,19 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<RegisterResponseModel> register(
     String name,
     String email,
+    String phoneNumber,
     String password,
+    bool termsAccepted,
   ) async {
     final response = await _apiClient.post(
       ApiConstants.register,
-      data: RegisterRequestModel(name: name, email: email, password: password).toJson(),
+      data: RegisterRequestModel(
+        name: name,
+        email: email,
+        phoneNumber: phoneNumber,
+        password: password,
+        termsAccepted: termsAccepted,
+      ).toJson(),
     );
     final data = response.data['data'] as Map<String, dynamic>;
     return RegisterResponseModel.fromJson(data);

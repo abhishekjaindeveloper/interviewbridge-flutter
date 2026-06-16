@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+//import 'package:flutter/gestures.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -6,7 +7,9 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/validation_constants.dart';
 import '../../../../core/widgets/custom_button.dart';
+import '../../../../core/routes/route_constants.dart';
 import '../../../../core/widgets/custom_text_field.dart';
+import '../../../../core/widgets/error_dialog.dart';
 import '../../../../core/utils/validators.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
@@ -26,13 +29,19 @@ class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  AutovalidateMode _autovalidateMode = AutovalidateMode.disabled;
+  bool _termsAccepted = false;
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
+    _phoneController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
@@ -44,9 +53,15 @@ class _RegisterPageState extends State<RegisterPage> {
             RegisterRequested(
               name: _nameController.text.trim(),
               email: _emailController.text.trim(),
+              phoneNumber: _phoneController.text.trim(),
               password: _passwordController.text.trim(),
+              termsAccepted: _termsAccepted,
             ),
           );
+    } else {
+      setState(() {
+        _autovalidateMode = AutovalidateMode.onUserInteraction;
+      });
     }
   }
 
@@ -59,14 +74,14 @@ class _RegisterPageState extends State<RegisterPage> {
           if (state is Authenticated) {
             Navigator.of(context).pop();
           } else if (state is AuthError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  state.message,
-                  style: AppTypography.bodyMedium.copyWith(color: AppColors.white),
-                ),
-                backgroundColor: AppColors.error,
-              ),
+            final isNetworkError = state.message == AppConstants.noConnection;
+            ErrorDialog.show(
+              context: context,
+              title: isNetworkError
+                  ? AppConstants.dialogTitleNetworkError
+                  : AppConstants.dialogTitleAuthError,
+              message: state.message,
+              type: DialogType.error,
             );
           }
         },
@@ -91,6 +106,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       hintText: AppConstants.fullNameHint,
                       controller: _nameController,
                       validator: Validators.validateName,
+                      autovalidateMode: _autovalidateMode,
                       enabled: !isLoading,
                     ),
                     const SizedBox(height: AppSpacing.md),
@@ -100,6 +116,17 @@ class _RegisterPageState extends State<RegisterPage> {
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
                       validator: Validators.validateEmail,
+                      autovalidateMode: _autovalidateMode,
+                      enabled: !isLoading,
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    CustomTextField(
+                      labelText: AppConstants.phoneNumberLabel,
+                      hintText: AppConstants.phoneNumberHint,
+                      controller: _phoneController,
+                      keyboardType: TextInputType.phone,
+                      validator: Validators.validatePhone,
+                      autovalidateMode: _autovalidateMode,
                       enabled: !isLoading,
                     ),
                     const SizedBox(height: AppSpacing.md),
@@ -107,17 +134,30 @@ class _RegisterPageState extends State<RegisterPage> {
                       labelText: AppConstants.passwordLabel,
                       hintText: AppConstants.passwordHint,
                       controller: _passwordController,
-                      obscureText: true,
+                      obscureText: _obscurePassword,
                       validator: Validators.validatePassword,
+                      autovalidateMode: _autovalidateMode,
                       enabled: !isLoading,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                          color: AppColors.textSecondary,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscurePassword = !_obscurePassword;
+                          });
+                        },
+                      ),
                     ),
                     const SizedBox(height: AppSpacing.md),
                     CustomTextField(
                       labelText: AppConstants.confirmPasswordLabel,
                       hintText: AppConstants.confirmPasswordHint,
                       controller: _confirmPasswordController,
-                      obscureText: true,
+                      obscureText: _obscureConfirmPassword,
                       enabled: !isLoading,
+                      autovalidateMode: _autovalidateMode,
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
                           return ValidationConstants.passwordRequired;
@@ -127,11 +167,107 @@ class _RegisterPageState extends State<RegisterPage> {
                         }
                         return null;
                       },
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                          color: AppColors.textSecondary,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscureConfirmPassword = !_obscureConfirmPassword;
+                          });
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    FormField<bool>(
+                      initialValue: false,
+                      validator: (value) {
+                        if (value != true) {
+                          return ValidationConstants.termsRequired;
+                        }
+                        return null;
+                      },
+                      autovalidateMode: _autovalidateMode,
+                      builder: (FormFieldState<bool> state) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Checkbox(
+                                  value: state.value ?? false,
+                                  onChanged: isLoading
+                                      ? null
+                                      : (value) {
+                                          state.didChange(value);
+                                          setState(() {
+                                            _termsAccepted = value ?? false;
+                                          });
+                                        },
+                                  activeColor: AppColors.primary,
+                                  checkColor: AppColors.white,
+                                  side: const BorderSide(color: AppColors.border),
+                                ),
+                                Expanded(
+                                  child: Wrap(
+                                    crossAxisAlignment: WrapCrossAlignment.center,
+                                    children: [
+                                      Text(
+                                        AppConstants.termsAgreementPrefix,
+                                        style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.of(context).pushNamed(RouteConstants.termsConditions);
+                                        },
+                                        child: Text(
+                                          AppConstants.termsConditionsLabel,
+                                          style: AppTypography.bodyMedium.copyWith(
+                                            color: AppColors.primary,
+                                            fontWeight: FontWeight.bold,
+                                            decoration: TextDecoration.underline,
+                                          ),
+                                        ),
+                                      ),
+                                      Text(
+                                        ' and ',
+                                        style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.of(context).pushNamed(RouteConstants.privacyPolicy);
+                                        },
+                                        child: Text(
+                                          AppConstants.privacyPolicyLabel,
+                                          style: AppTypography.bodyMedium.copyWith(
+                                            color: AppColors.primary,
+                                            fontWeight: FontWeight.bold,
+                                            decoration: TextDecoration.underline,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            if (state.hasError)
+                              Padding(
+                                padding: const EdgeInsets.only(left: 12.0, top: 4.0),
+                                child: Text(
+                                  state.errorText!,
+                                  style: AppTypography.bodyMedium.copyWith(color: AppColors.error),
+                                ),
+                              ),
+                          ],
+                        );
+                      },
                     ),
                     const SizedBox(height: AppSpacing.xl),
                     CustomButton(
                       text: AppConstants.registerButton,
-                      onPressed: isLoading ? null : _onRegisterPressed,
+                      onPressed: (isLoading || !_termsAccepted) ? null : _onRegisterPressed,
                       isLoading: isLoading,
                     ),
                     const SizedBox(height: AppSpacing.lg),

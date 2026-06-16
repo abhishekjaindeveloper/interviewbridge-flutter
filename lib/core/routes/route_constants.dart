@@ -12,4 +12,7 @@ class RouteConstants {
   static const String evaluationResults = '/evaluation-results';
   static const String pendingApproval = '/pending-approval';
   static const String sessionHistory = '/session-history';
+  static const String landing = '/landing';
+  static const String termsConditions = '/terms-conditions';
+  static const String privacyPolicy = '/privacy-policy';
 }

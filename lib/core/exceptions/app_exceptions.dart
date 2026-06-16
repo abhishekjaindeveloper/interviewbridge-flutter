@@ -23,3 +23,15 @@ class NetworkException extends AppException {
 class UnauthorizedException extends AppException {
   UnauthorizedException([super.message = 'Unauthorized access']);
 }
+
+class AccountPendingApprovalException extends AppException {
+  AccountPendingApprovalException([super.message = 'Your account is pending admin approval. Please wait for approval before logging in.']);
+}
+
+class InvalidCredentialsException extends AppException {
+  InvalidCredentialsException([super.message = 'Invalid email or password.']);
+}
+
+class AccessDeniedException extends AppException {
+  AccessDeniedException([super.message = 'Access Denied']);
+}

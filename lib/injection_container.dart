@@ -16,11 +16,25 @@ import 'features/auth/domain/usecases/logout_usecase.dart';
 import 'features/auth/domain/usecases/register_usecase.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 
+// Admin Feature
+import 'features/admin/presentation/bloc/admin_bloc.dart';
+import 'features/admin/domain/usecases/get_pending_users_usecase.dart';
+import 'features/admin/domain/usecases/approve_user_usecase.dart';
+import 'features/admin/domain/usecases/reject_user_usecase.dart';
+import 'features/admin/domain/repositories/admin_repository.dart';
+import 'features/admin/data/repositories/admin_repository_impl.dart';
+import 'features/admin/data/datasources/admin_remote_datasource.dart';
+
 // Technology Feature
 import 'features/technology/data/datasources/technology_remote_datasource.dart';
 import 'features/technology/data/repositories/technology_repository_impl.dart';
 import 'features/technology/domain/repositories/technology_repository.dart';
 import 'features/technology/domain/usecases/get_technologies_usecase.dart';
+import 'features/technology/domain/usecases/get_all_technologies_usecase.dart';
+import 'features/technology/domain/usecases/create_technology_usecase.dart';
+import 'features/technology/domain/usecases/update_technology_usecase.dart';
+import 'features/technology/domain/usecases/activate_technology_usecase.dart';
+import 'features/technology/domain/usecases/deactivate_technology_usecase.dart';
 import 'features/technology/presentation/bloc/technology_bloc.dart';
 
 // Experience Feature
@@ -28,6 +42,11 @@ import 'features/experience/data/datasources/experience_remote_datasource.dart';
 import 'features/experience/data/repositories/experience_repository_impl.dart';
 import 'features/experience/domain/repositories/experience_repository.dart';
 import 'features/experience/domain/usecases/get_experiences_usecase.dart';
+import 'features/experience/domain/usecases/get_all_experiences_usecase.dart';
+import 'features/experience/domain/usecases/create_experience_usecase.dart';
+import 'features/experience/domain/usecases/update_experience_usecase.dart';
+import 'features/experience/domain/usecases/activate_experience_usecase.dart';
+import 'features/experience/domain/usecases/deactivate_experience_usecase.dart';
 import 'features/experience/presentation/bloc/experience_bloc.dart';
 
 // Profile Feature
@@ -105,14 +124,36 @@ Future<void> init() async {
   sl.registerLazySingleton<AuthLocalDataSource>(() => AuthLocalDataSourceImpl(sl()));
 
   // 2. Admin Feature
+  sl.registerFactory(
+    () => AdminBloc(
+      getPendingUsersUseCase: sl(),
+      approveUserUseCase: sl(),
+      rejectUserUseCase: sl(),
+    ),
+  );
+  sl.registerLazySingleton(() => GetPendingUsersUseCase(sl()));
+  sl.registerLazySingleton(() => ApproveUserUseCase(sl()));
+  sl.registerLazySingleton(() => RejectUserUseCase(sl()));
+  sl.registerLazySingleton<AdminRepository>(() => AdminRepositoryImpl(sl()));
+  sl.registerLazySingleton<AdminRemoteDataSource>(() => AdminRemoteDataSourceImpl(sl()));
   
   // 3. Technology Feature
   sl.registerFactory(
     () => TechnologyBloc(
       getTechnologiesUseCase: sl(),
+      getAllTechnologiesUseCase: sl(),
+      createTechnologyUseCase: sl(),
+      updateTechnologyUseCase: sl(),
+      activateTechnologyUseCase: sl(),
+      deactivateTechnologyUseCase: sl(),
     ),
   );
   sl.registerLazySingleton(() => GetTechnologiesUseCase(sl()));
+  sl.registerLazySingleton(() => GetAllTechnologiesUseCase(sl()));
+  sl.registerLazySingleton(() => CreateTechnologyUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateTechnologyUseCase(sl()));
+  sl.registerLazySingleton(() => ActivateTechnologyUseCase(sl()));
+  sl.registerLazySingleton(() => DeactivateTechnologyUseCase(sl()));
   sl.registerLazySingleton<TechnologyRepository>(() => TechnologyRepositoryImpl(sl()));
   sl.registerLazySingleton<TechnologyRemoteDataSource>(() => TechnologyRemoteDataSourceImpl(sl()));
 
@@ -120,9 +161,19 @@ Future<void> init() async {
   sl.registerFactory(
     () => ExperienceBloc(
       getExperiencesUseCase: sl(),
+      getAllExperiencesUseCase: sl(),
+      createExperienceUseCase: sl(),
+      updateExperienceUseCase: sl(),
+      activateExperienceUseCase: sl(),
+      deactivateExperienceUseCase: sl(),
     ),
   );
   sl.registerLazySingleton(() => GetExperiencesUseCase(sl()));
+  sl.registerLazySingleton(() => GetAllExperiencesUseCase(sl()));
+  sl.registerLazySingleton(() => CreateExperienceUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateExperienceUseCase(sl()));
+  sl.registerLazySingleton(() => ActivateExperienceUseCase(sl()));
+  sl.registerLazySingleton(() => DeactivateExperienceUseCase(sl()));
   sl.registerLazySingleton<ExperienceRepository>(() => ExperienceRepositoryImpl(sl()));
   sl.registerLazySingleton<ExperienceRemoteDataSource>(() => ExperienceRemoteDataSourceImpl(sl()));
 

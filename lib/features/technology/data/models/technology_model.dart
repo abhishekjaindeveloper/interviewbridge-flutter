@@ -5,6 +5,7 @@ class TechnologyModel extends TechnologyEntity {
     required super.id,
     required super.name,
     required super.description,
+    super.isActive = true,
   });
 
   factory TechnologyModel.fromJson(Map<String, dynamic> json) {
@@ -12,6 +13,7 @@ class TechnologyModel extends TechnologyEntity {
       id: json['id'] as String? ?? '',
       name: json['technologyName'] as String? ?? '',
       description: json['description'] as String? ?? '',
+      isActive: json['isActive'] as bool? ?? true,
     );
   }
 
@@ -20,6 +22,7 @@ class TechnologyModel extends TechnologyEntity {
       'id': id,
       'technologyName': name,
       'description': description,
+      'isActive': isActive,
     };
   }
 
@@ -28,6 +31,7 @@ class TechnologyModel extends TechnologyEntity {
       id: id,
       name: name,
       description: description,
+      isActive: isActive,
     );
   }
 }

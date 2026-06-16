@@ -10,6 +10,9 @@ class CustomTextField extends StatelessWidget {
   final String? Function(String?)? validator;
   final TextInputType keyboardType;
   final bool enabled;
+  final String? errorText;
+  final AutovalidateMode? autovalidateMode;
+  final Widget? suffixIcon;
 
   const CustomTextField({
     super.key,
@@ -20,6 +23,9 @@ class CustomTextField extends StatelessWidget {
     this.validator,
     this.keyboardType = TextInputType.text,
     this.enabled = true,
+    this.errorText,
+    this.autovalidateMode,
+    this.suffixIcon,
   });
 
   @override
@@ -38,9 +44,12 @@ class CustomTextField extends StatelessWidget {
           validator: validator,
           keyboardType: keyboardType,
           enabled: enabled,
+          autovalidateMode: autovalidateMode,
           style: AppTypography.bodyLarge,
           decoration: InputDecoration(
             hintText: hintText,
+            errorText: errorText,
+            suffixIcon: suffixIcon,
           ),
         ),
       ],

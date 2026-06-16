@@ -7,6 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/widgets/custom_button.dart';
+import '../../../../core/widgets/error_dialog.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
@@ -22,14 +23,14 @@ class PendingApprovalPage extends StatelessWidget {
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  state.message,
-                  style: AppTypography.bodyMedium.copyWith(color: AppColors.white),
-                ),
-                backgroundColor: AppColors.error,
-              ),
+            final isNetworkError = state.message == AppConstants.noConnection;
+            ErrorDialog.show(
+              context: context,
+              title: isNetworkError
+                  ? AppConstants.dialogTitleNetworkError
+                  : AppConstants.dialogTitleAuthError,
+              message: state.message,
+              type: DialogType.error,
             );
           }
         },
@@ -70,12 +71,12 @@ class PendingApprovalPage extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: AppSpacing.xxl),
-                  CustomButton(
-                    text: AppConstants.logoutButton,
+                   CustomButton(
+                    text: AppConstants.okButton,
                     onPressed: isLoading
                         ? null
                         : () {
-                            context.read<AuthBloc>().add(LogoutRequested());
+                            context.read<AuthBloc>().add(ClearRegistrationState());
                           },
                     isLoading: isLoading,
                   ),

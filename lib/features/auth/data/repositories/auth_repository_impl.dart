@@ -29,10 +29,18 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<AuthUserEntity> register(
     String name,
     String email,
+    String phoneNumber,
     String password,
+    bool termsAccepted,
   ) async {
     try {
-      final model = await _remoteDataSource.register(name, email, password);
+      final model = await _remoteDataSource.register(
+        name,
+        email,
+        phoneNumber,
+        password,
+        termsAccepted,
+      );
       if (model.token.isNotEmpty) {
         await _localDataSource.saveToken(model.token);
       }
@@ -66,11 +74,8 @@ class AuthRepositoryImpl implements AuthRepository {
   AppException _mapDioException(DioException e) {
     if (e.type == DioExceptionType.connectionTimeout ||
         e.type == DioExceptionType.sendTimeout ||
-        e.type == DioExceptionType.receiveTimeout) {
-      return NetworkException(AppConstants.noConnection);
-    }
-    
-    if (e.type == DioExceptionType.connectionError) {
+        e.type == DioExceptionType.receiveTimeout ||
+        e.type == DioExceptionType.connectionError) {
       return NetworkException(AppConstants.noConnection);
     }
 
@@ -86,8 +91,30 @@ class AuthRepositoryImpl implements AuthRepository {
         }
       }
 
-      if (status == 401 || status == 403) {
+      final normalizedMsg = message.toLowerCase();
+
+      if (normalizedMsg.contains('pending admin approval') || normalizedMsg.contains('pending approval')) {
+        return AccountPendingApprovalException(AppConstants.errorPendingApproval);
+      }
+
+      if (normalizedMsg.contains('rejected')) {
+        return AccessDeniedException(AppConstants.errorRejected);
+      }
+
+      if (normalizedMsg.contains('inactive') || normalizedMsg.contains('disabled')) {
+        return InvalidCredentialsException(AppConstants.errorDisabledAccount);
+      }
+
+      if (normalizedMsg.contains('invalid email or password') || normalizedMsg.contains('invalid credentials')) {
+        return InvalidCredentialsException(AppConstants.errorInvalidCredentials);
+      }
+
+      if (status == 401) {
         return UnauthorizedException(message);
+      }
+
+      if (status == 403) {
+        return AccessDeniedException(message);
       }
 
       return ServerException(message);

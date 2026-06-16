@@ -20,6 +20,54 @@ class TechnologyRepositoryImpl implements TechnologyRepository {
     }
   }
 
+  @override
+  Future<List<TechnologyEntity>> getAllTechnologies() async {
+    try {
+      final models = await _remoteDataSource.getAllTechnologies();
+      return models.map((model) => model.toEntity()).toList();
+    } on DioException catch (e) {
+      throw _mapDioException(e);
+    }
+  }
+
+  @override
+  Future<TechnologyEntity> createTechnology(String name, String description) async {
+    try {
+      final model = await _remoteDataSource.createTechnology(name, description);
+      return model.toEntity();
+    } on DioException catch (e) {
+      throw _mapDioException(e);
+    }
+  }
+
+  @override
+  Future<TechnologyEntity> updateTechnology(String id, String name, String description) async {
+    try {
+      final model = await _remoteDataSource.updateTechnology(id, name, description);
+      return model.toEntity();
+    } on DioException catch (e) {
+      throw _mapDioException(e);
+    }
+  }
+
+  @override
+  Future<void> activateTechnology(String id) async {
+    try {
+      await _remoteDataSource.activateTechnology(id);
+    } on DioException catch (e) {
+      throw _mapDioException(e);
+    }
+  }
+
+  @override
+  Future<void> deactivateTechnology(String id) async {
+    try {
+      await _remoteDataSource.deactivateTechnology(id);
+    } on DioException catch (e) {
+      throw _mapDioException(e);
+    }
+  }
+
   AppException _mapDioException(DioException e) {
     if (e.type == DioExceptionType.connectionTimeout ||
         e.type == DioExceptionType.sendTimeout ||

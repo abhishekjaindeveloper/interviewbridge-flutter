@@ -26,11 +26,17 @@ void main() {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const App());
 
-    // Pump to trigger AuthStarted and transition states
-    await tester.pump();
-    await tester.pump(const Duration(seconds: 1));
+    // Verify that the Splash Screen displays on initial load.
+    expect(find.text(AppConstants.appName), findsOneWidget);
+    expect(find.text(AppConstants.splashTagline), findsOneWidget);
 
-    // Verify that our login page displays the title 'Welcome Back'.
-    expect(find.text(AppConstants.loginTitle), findsOneWidget);
+    // Pump to run the 3-second splash screen timer and complete the navigation transition
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 3100));
+    await tester.pumpAndSettle();
+
+    // Verify that we successfully navigated to the Landing Page.
+    expect(find.text(AppConstants.landingHeroTitle), findsOneWidget);
+    expect(find.text(AppConstants.getStartedButton), findsOneWidget);
   });
 }

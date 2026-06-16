@@ -17,6 +17,7 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDisabled = onPressed == null || isLoading;
     return SizedBox(
       width: double.infinity,
       height: AppDimensions.buttonHeight,
@@ -41,7 +42,9 @@ class CustomButton extends StatelessWidget {
               )
             : Text(
                 text,
-                style: AppTypography.buttonText,
+                style: AppTypography.buttonText.copyWith(
+                  color: isDisabled ? AppColors.textSecondary : AppColors.white,
+                ),
               ),
       ),
     );
