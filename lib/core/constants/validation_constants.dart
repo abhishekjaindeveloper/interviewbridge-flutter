@@ -9,6 +9,6 @@ class ValidationConstants {
   static const String passwordTooShort = 'Password must be at least 6 characters';
   static const String nameRequired = 'Name is required';
   static const String phoneRequired = 'Phone number is required';
-  static const String invalidPhone = 'Enter a valid phone number';
+  static const String invalidPhone = 'Please enter a valid 10-digit mobile number.';
   static const String termsRequired = 'Please accept Terms & Conditions and Privacy Policy.';
 }

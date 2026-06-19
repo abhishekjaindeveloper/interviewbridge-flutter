@@ -32,7 +32,7 @@ class _SessionHistoryPageState extends State<SessionHistoryPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           AppConstants.sessionHistoryTitle,
           style: AppTypography.headingMedium,
         ),
@@ -65,7 +65,7 @@ class _SessionHistoryPageState extends State<SessionHistoryPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.history_rounded,
                       color: AppColors.textSecondary,
                       size: 64,

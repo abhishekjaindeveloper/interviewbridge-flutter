@@ -146,7 +146,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
               gradient: LinearGradient(
                 begin: _alignmentBegin.value,
                 end: _alignmentEnd.value,
-                colors: const [
+                colors: [
                   AppColors.background,
                   AppColors.surface,
                 ],

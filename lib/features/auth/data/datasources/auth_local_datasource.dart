@@ -36,6 +36,7 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
     await _secureStorageService.writeUserEmail(user.email);
     await _secureStorageService.writeUserRole(user.role);
     await _secureStorageService.writeApprovalStatus(user.approvalStatus);
+    await _secureStorageService.writeUserPhone(user.phoneNumber);
   }
 
   @override
@@ -44,6 +45,7 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
     final name = await _secureStorageService.readUserName();
     final role = await _secureStorageService.readUserRole();
     final status = await _secureStorageService.readApprovalStatus();
+    final phone = await _secureStorageService.readUserPhone() ?? '';
 
     if (email == null || email.isEmpty ||
         name == null || name.isEmpty ||
@@ -55,6 +57,7 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
     return AuthUserEntity(
       name: name,
       email: email,
+      phoneNumber: phone,
       role: role,
       approvalStatus: status,
     );
@@ -66,5 +69,6 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
     await _secureStorageService.writeUserEmail('');
     await _secureStorageService.writeUserRole('');
     await _secureStorageService.writeApprovalStatus('');
+    await _secureStorageService.writeUserPhone('');
   }
 }

@@ -6,4 +6,5 @@ class StorageConstants {
   static const String keyUserName = 'user_name';
   static const String keyUserRole = 'user_role';
   static const String keyApprovalStatus = 'user_approval_status';
+  static const String keyUserPhone = 'user_phone';
 }

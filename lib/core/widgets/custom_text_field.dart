@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../theme/app_typography.dart';
 import '../theme/app_spacing.dart';
 
@@ -13,6 +14,9 @@ class CustomTextField extends StatelessWidget {
   final String? errorText;
   final AutovalidateMode? autovalidateMode;
   final Widget? suffixIcon;
+  final List<TextInputFormatter>? inputFormatters;
+  final int? maxLines;
+  final int? maxLength;
 
   const CustomTextField({
     super.key,
@@ -26,6 +30,9 @@ class CustomTextField extends StatelessWidget {
     this.errorText,
     this.autovalidateMode,
     this.suffixIcon,
+    this.inputFormatters,
+    this.maxLines = 1,
+    this.maxLength,
   });
 
   @override
@@ -46,6 +53,9 @@ class CustomTextField extends StatelessWidget {
           enabled: enabled,
           autovalidateMode: autovalidateMode,
           style: AppTypography.bodyLarge,
+          inputFormatters: inputFormatters,
+          maxLines: maxLines,
+          maxLength: maxLength,
           decoration: InputDecoration(
             hintText: hintText,
             errorText: errorText,

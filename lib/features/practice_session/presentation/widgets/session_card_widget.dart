@@ -69,7 +69,7 @@ class SessionCardWidget extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
-              const Divider(color: AppColors.border, height: 1),
+              Divider(color: AppColors.border, height: 1),
               const SizedBox(height: AppSpacing.md),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

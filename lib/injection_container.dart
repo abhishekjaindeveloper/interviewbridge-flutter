@@ -1,9 +1,12 @@
 import 'package:get_it/get_it.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'core/network/api_client.dart';
 import 'core/network/api_interceptors.dart';
 import 'core/storage/secure_storage_service.dart';
+import 'core/theme/theme_storage_service.dart';
+import 'core/theme/theme_cubit.dart';
 
 // Auth Feature
 import 'features/auth/data/datasources/auth_local_datasource.dart';
@@ -21,6 +24,10 @@ import 'features/admin/presentation/bloc/admin_bloc.dart';
 import 'features/admin/domain/usecases/get_pending_users_usecase.dart';
 import 'features/admin/domain/usecases/approve_user_usecase.dart';
 import 'features/admin/domain/usecases/reject_user_usecase.dart';
+import 'features/admin/domain/usecases/get_admin_user_statistics_usecase.dart';
+import 'features/admin/domain/usecases/get_users_usecase.dart';
+import 'features/admin/domain/usecases/activate_user_usecase.dart';
+import 'features/admin/domain/usecases/deactivate_user_usecase.dart';
 import 'features/admin/domain/repositories/admin_repository.dart';
 import 'features/admin/data/repositories/admin_repository_impl.dart';
 import 'features/admin/data/datasources/admin_remote_datasource.dart';
@@ -97,6 +104,18 @@ Future<void> init() async {
   sl.registerLazySingleton<FlutterSecureStorage>(() => const FlutterSecureStorage());
   sl.registerLazySingleton<SecureStorageService>(() => SecureStorageService(sl()));
 
+  // Theme Storage & Cubit
+  sl.registerLazySingleton<ThemeStorageService>(() => ThemeStorageService(sl()));
+  final themeStorage = ThemeStorageService(const FlutterSecureStorage());
+  final savedTheme = await themeStorage.readTheme();
+  ThemeMode initialTheme = ThemeMode.light;
+  if (savedTheme == 'dark') {
+    initialTheme = ThemeMode.dark;
+  } else if (savedTheme == 'system') {
+    initialTheme = ThemeMode.system;
+  }
+  sl.registerLazySingleton<ThemeCubit>(() => ThemeCubit(sl(), initialTheme));
+
   // Network (Dio & ApiClient)
   sl.registerLazySingleton<Dio>(() => Dio());
   sl.registerLazySingleton<ApiInterceptors>(() => ApiInterceptors(sl()));
@@ -129,11 +148,19 @@ Future<void> init() async {
       getPendingUsersUseCase: sl(),
       approveUserUseCase: sl(),
       rejectUserUseCase: sl(),
+      getAdminUserStatisticsUseCase: sl(),
+      getUsersUseCase: sl(),
+      activateUserUseCase: sl(),
+      deactivateUserUseCase: sl(),
     ),
   );
   sl.registerLazySingleton(() => GetPendingUsersUseCase(sl()));
   sl.registerLazySingleton(() => ApproveUserUseCase(sl()));
   sl.registerLazySingleton(() => RejectUserUseCase(sl()));
+  sl.registerLazySingleton(() => GetAdminUserStatisticsUseCase(sl()));
+  sl.registerLazySingleton(() => GetUsersUseCase(sl()));
+  sl.registerLazySingleton(() => ActivateUserUseCase(sl()));
+  sl.registerLazySingleton(() => DeactivateUserUseCase(sl()));
   sl.registerLazySingleton<AdminRepository>(() => AdminRepositoryImpl(sl()));
   sl.registerLazySingleton<AdminRemoteDataSource>(() => AdminRemoteDataSourceImpl(sl()));
   

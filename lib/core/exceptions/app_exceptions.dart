@@ -35,3 +35,16 @@ class InvalidCredentialsException extends AppException {
 class AccessDeniedException extends AppException {
   AccessDeniedException([super.message = 'Access Denied']);
 }
+
+class UserRejectedException extends AppException {
+  final String rejectionReason;
+  UserRejectedException(this.rejectionReason, [super.message = 'Registration Rejected']);
+}
+
+class PhoneAlreadyRegisteredException extends AppException {
+  PhoneAlreadyRegisteredException([super.message = 'Phone number already registered.']);
+}
+
+class EmailAlreadyRegisteredException extends AppException {
+  EmailAlreadyRegisteredException([super.message = 'Email address already registered.']);
+}

@@ -50,6 +50,9 @@ class ApiConstants {
   static const String adminPendingUsers = '/api/admin/users/pending';
   static const String adminApproveUser = '/api/admin/users'; // Append /{id}/approve
   static const String adminRejectUser = '/api/admin/users';  // Append /{id}/reject
+  static const String adminUsers = '/api/admin/users';
+  static const String adminUsersSearch = '/api/admin/users/search';
+  static const String adminUsersStatistics = '/api/admin/users/statistics';
 
   // Technology Endpoints
   static const String adminTechnologies = '/api/admin/technologies';

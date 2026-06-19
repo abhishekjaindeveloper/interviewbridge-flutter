@@ -73,7 +73,7 @@ class SessionSummaryWidget extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.md),
-          const Divider(color: AppColors.border),
+          Divider(color: AppColors.border),
           const SizedBox(height: AppSpacing.sm),
           _buildRow(AppConstants.sessionIdLabel, '${session.id.substring(0, 8)}...'),
           _buildRow(AppConstants.technologyLabel, session.technologyName),

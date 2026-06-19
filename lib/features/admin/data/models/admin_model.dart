@@ -8,6 +8,7 @@ class AdminModel extends AdminEntity {
     super.phoneNumber,
     required super.role,
     required super.approvalStatus,
+    super.isActive = true,
     super.createdAt,
   });
 
@@ -19,6 +20,7 @@ class AdminModel extends AdminEntity {
       phoneNumber: json['phoneNumber'] as String?,
       role: json['role'] as String? ?? '',
       approvalStatus: json['approvalStatus'] as String? ?? '',
+      isActive: json['isActive'] as bool? ?? true,
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'] as String)
           : null,
@@ -33,6 +35,7 @@ class AdminModel extends AdminEntity {
       'phoneNumber': phoneNumber,
       'role': role,
       'approvalStatus': approvalStatus,
+      'isActive': isActive,
       'createdAt': createdAt?.toIso8601String(),
     };
   }

@@ -57,6 +57,40 @@ class AppConstants {
   static const String placeholderExperienceMaster = 'Experience Master CRUD Placeholder';
   static const String placeholderProfile = 'Admin Profile Placeholder';
 
+  // Admin Profile Strings
+  static const String adminRoleLabel = 'Administrator';
+  static const String adminProfileTitle = 'Admin Profile';
+  static const String profileLabelName = 'Full Name';
+  static const String profileLabelEmail = 'Email Address';
+  static const String profileLabelPhone = 'Phone Number';
+  static const String profileLabelRole = 'Role';
+  static const String profileLabelStatus = 'Account Status';
+  static const String profileLabelCreated = 'Account Created';
+  static const String btnEditProfile = 'Edit Profile';
+  static const String btnChangePassword = 'Change Password';
+  static const String adminStatusActive = 'Active';
+  static const String adminJoinedDate = 'June 1, 2026';
+
+  // Logout Dialog & Drawer Strings
+  static const String logoutTitle = 'Logout';
+  static const String logoutConfirmationMessage = 'Are you sure you want to logout?';
+  static const String logoutButtonLabel = 'Logout';
+  static const String cancelButtonLabel = 'Cancel';
+  static const String administratorLabel = 'Administrator';
+
+
+  // Admin Overview Strings
+  static const String adminWelcomeBack = 'Welcome Back,';
+  static const String adminSystemSummary = 'Here is the current status of your interview prep system.';
+  static const String adminTotalPendingUsers = 'Total Pending Users';
+  static const String adminTotalTechnologies = 'Total Technologies';
+  static const String adminTotalExperienceLevels = 'Total Experience Levels';
+  static const String adminTotalApprovedUsers = 'Total Approved Users';
+  static const String adminQuickActions = 'Quick Actions';
+  static const String adminActionReviewPending = 'Review Pending Users';
+  static const String adminActionManageTech = 'Manage Technologies';
+  static const String adminActionManageExp = 'Manage Experience Levels';
+
   // Dialog Titles
   static const String dialogTitleError = 'Error';
   static const String dialogTitleSuccess = 'Success';
@@ -72,6 +106,12 @@ class AppConstants {
   static const String errorRejected = 'Your account has been rejected. Please contact the administrator.';
   static const String errorInvalidCredentials = 'Invalid email or password.';
   static const String errorDisabledAccount = 'Your account is currently inactive.';
+  static const String errorUserNotFound = 'Email or phone number not found.';
+  static const String errorIncorrectPassword = 'Incorrect password.';
+  static const String pendingUserTitle = 'Account Pending Approval';
+  static const String pendingUserMessage = 'Your registration request is awaiting administrator approval.';
+
+
 
   // Profile Strings
   static const String profileTitle = 'User Profile';
@@ -263,4 +303,75 @@ class AppConstants {
   static const String btnActivate = 'Activate';
   static const String btnDeactivate = 'Deactivate';
   static const String searchPlaceholder = 'Search...';
+
+  // Validation constants
+  static const String phoneNumberRequired = 'Phone number is required';
+  static const String invalidPhoneNumberMessage = 'Please enter a valid 10-digit mobile number.';
+  static const String emailOrPhoneRequired = 'Email or Phone Number is required';
+  static const String invalidEmailOrPhone = 'Enter a valid email or phone number';
+
+  // Theme constants
+  static const String themeLabel = 'Theme';
+  static const String selectThemeTitle = 'Select Theme';
+  static const String lightThemeLabel = 'Light Theme';
+  static const String darkThemeLabel = 'Dark Theme';
+  static const String systemThemeLabel = 'System Default';
+
+  // Exit dialog constants
+  static const String exitTitle = 'Exit Application';
+  static const String exitMessage = 'Do you want to exit the application?';
+  static const String exitButtonLabel = 'Exit';
+
+  // Rejection Flow constants
+  static const String rejectUserTitle = 'Reject User';
+  static const String rejectReasonLabel = 'Rejection Reason';
+  static const String rejectReasonHint = 'Enter detailed reason (min 10 characters)...';
+  static const String rejectReasonRequired = 'Rejection reason is required.';
+  static const String rejectReasonTooShort = 'Rejection reason must be at least 10 characters.';
+  static const String rejectReasonTooLong = 'Rejection reason must not exceed 500 characters.';
+  static const String rejectUserButtonLabel = 'Reject';
+  static const String rejectionDialogTitle = 'Registration Rejected';
+  static const String rejectionDialogReasonLabel = 'Reason: ';
+  static const String rejectionDialogContactSupport = 'Please contact support or register again with correct information.';
+  static const String rejectionRequestRejectedTitle = 'Registration Request Rejected';
+  static const String rejectionRequestFallbackMessage = 'Your registration request was not approved by the administrator.\n\nPlease contact support for more information.';
+  static const String rejectionReasonPrefix = 'Reason:\n';
+
+  // Duplicate Phone constants
+  static const String duplicatePhoneTitle = 'Phone Number Already Registered';
+  static const String duplicatePhoneMessage = 'This mobile number is already associated with an existing account.\n\nPlease use a different mobile number or login with your existing account.';
+  static const String duplicatePhoneValidationMessage = 'Phone number already registered.\nPlease use another mobile number.';
+  static const String duplicateEmailValidationMessage = 'Email address already registered.\nPlease use another email or login.';
+
+
+  // Admin User Management constants
+  static const String menuManageUsers = 'Manage Users';
+  static const String placeholderManageUsers = 'User Management CRUD';
+  static const String adminTotalUsers = 'Total Users';
+  static const String adminActiveUsers = 'Active Users';
+  static const String adminInactiveUsers = 'Inactive Users';
+  static const String userManagementTitle = 'Manage Users';
+  static const String columnUserName = 'Name';
+  static const String columnUserEmail = 'Email';
+  static const String columnUserPhone = 'Phone Number';
+  static const String columnUserRole = 'Role';
+  static const String columnUserApproval = 'Approval Status';
+  static const String columnUserStatus = 'Status';
+  static const String columnUserCreated = 'Created Date';
+  static const String userSearchHint = 'Search by name, email, or phone...';
+  static const String filterAll = 'All Users';
+  static const String filterActive = 'Active';
+  static const String filterInactive = 'Inactive';
+  static const String filterPending = 'Pending';
+  static const String filterApproved = 'Approved';
+  static const String filterRejected = 'Rejected';
+  static const String deactivateUserDialogTitle = 'Deactivate User';
+  static const String deactivateUserDialogMessage = 'Are you sure you want to deactivate this account?';
+  static const String activateUserDialogTitle = 'Activate User';
+  static const String activateUserDialogMessage = 'Are you sure you want to activate this account?';
+  static const String deactivateButtonLabel = 'Deactivate';
+  static const String activateButtonLabel = 'Activate';
+  static const String userStatusToggleSuccess = 'User status updated successfully.';
+  static const String noUsersFound = 'No users found matching the criteria.';
 }
+

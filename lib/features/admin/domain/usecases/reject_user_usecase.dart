@@ -5,7 +5,7 @@ class RejectUserUseCase {
 
   RejectUserUseCase(this.repository);
 
-  Future<void> call(String id) async {
-    await repository.rejectUser(id);
+  Future<void> call(String id, String reason) async {
+    await repository.rejectUser(id, reason);
   }
 }

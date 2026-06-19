@@ -4,6 +4,7 @@ class LoginResponseModel {
   final String token;
   final String email;
   final String name;
+  final String phoneNumber;
   final String role;
   final String approvalStatus;
 
@@ -11,6 +12,7 @@ class LoginResponseModel {
     required this.token,
     required this.email,
     required this.name,
+    required this.phoneNumber,
     required this.role,
     required this.approvalStatus,
   });
@@ -20,6 +22,7 @@ class LoginResponseModel {
       token: json['token'] as String? ?? '',
       email: json['email'] as String? ?? '',
       name: json['name'] as String? ?? '',
+      phoneNumber: json['phoneNumber'] as String? ?? '',
       role: json['role'] as String? ?? '',
       approvalStatus: json['approvalStatus'] as String? ?? '',
     );
@@ -29,6 +32,7 @@ class LoginResponseModel {
     return AuthUserEntity(
       name: name,
       email: email,
+      phoneNumber: phoneNumber,
       role: role,
       approvalStatus: approvalStatus,
     );
@@ -39,6 +43,7 @@ class LoginResponseModel {
       'token': token,
       'email': email,
       'name': name,
+      'phoneNumber': phoneNumber,
       'role': role,
       'approvalStatus': approvalStatus,
     };

@@ -69,7 +69,7 @@ class _TechnologyExperienceSelectionPageState extends State<TechnologyExperience
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           AppConstants.selectionTitle,
           style: AppTypography.headingMedium,
         ),
@@ -183,7 +183,7 @@ class _TechnologyExperienceSelectionPageState extends State<TechnologyExperience
                             ),
 
                             const SizedBox(height: AppSpacing.xl),
-                            const Divider(color: AppColors.border),
+                            Divider(color: AppColors.border),
                             const SizedBox(height: AppSpacing.xl),
 
                             // Experience Section

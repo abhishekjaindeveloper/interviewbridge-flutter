@@ -75,7 +75,7 @@ class _TechnologyMasterWidgetState extends State<TechnologyMasterWidget> {
               backgroundColor: AppColors.surface,
               elevation: 0,
               shape: RoundedRectangleBorder(
-                side: const BorderSide(color: AppColors.border),
+                side: BorderSide(color: AppColors.border),
                 borderRadius: BorderRadius.circular(AppDimensions.cardRadius),
               ),
               child: Container(
@@ -195,7 +195,7 @@ class _TechnologyMasterWidgetState extends State<TechnologyMasterWidget> {
           backgroundColor: AppColors.surface,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            side: const BorderSide(color: AppColors.border),
+            side: BorderSide(color: AppColors.border),
             borderRadius: BorderRadius.circular(AppDimensions.cardRadius),
           ),
           child: Container(
@@ -410,14 +410,14 @@ class _TechnologyMasterWidgetState extends State<TechnologyMasterWidget> {
       color: AppColors.surface,
       elevation: 0,
       shape: RoundedRectangleBorder(
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: AppColors.border),
         borderRadius: BorderRadius.circular(AppDimensions.inputRadius),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
         child: Row(
           children: [
-            const Icon(Icons.search, color: AppColors.textSecondary),
+            Icon(Icons.search, color: AppColors.textSecondary),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: TextField(
@@ -435,7 +435,7 @@ class _TechnologyMasterWidgetState extends State<TechnologyMasterWidget> {
             ),
             if (_searchController.text.isNotEmpty)
               IconButton(
-                icon: const Icon(Icons.clear, color: AppColors.textSecondary),
+                icon: Icon(Icons.clear, color: AppColors.textSecondary),
                 onPressed: () {
                   _searchController.clear();
                 },
@@ -465,7 +465,7 @@ class _TechnologyMasterWidgetState extends State<TechnologyMasterWidget> {
               color: AppColors.surfaceLight.withOpacity(AppDimensions.opacityLow),
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               Icons.code_off,
               color: AppColors.textSecondary,
               size: AppDimensions.iconLarge,
@@ -561,7 +561,7 @@ class _TechnologyMasterWidgetState extends State<TechnologyMasterWidget> {
           color: AppColors.surface,
           margin: const EdgeInsets.only(bottom: AppSpacing.md),
           shape: RoundedRectangleBorder(
-            side: const BorderSide(color: AppColors.border),
+            side: BorderSide(color: AppColors.border),
             borderRadius: BorderRadius.circular(AppDimensions.cardRadius),
           ),
           child: Padding(
@@ -616,7 +616,7 @@ class _TechnologyMasterWidgetState extends State<TechnologyMasterWidget> {
     return Card(
       color: AppColors.surface,
       shape: RoundedRectangleBorder(
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: AppColors.border),
         borderRadius: BorderRadius.circular(AppDimensions.cardRadius),
       ),
       child: ClipRRect(
@@ -632,7 +632,7 @@ class _TechnologyMasterWidgetState extends State<TechnologyMasterWidget> {
               headingRowColor: MaterialStateProperty.all(AppColors.surfaceLight.withOpacity(0.3)),
               dataRowColor: MaterialStateProperty.all(AppColors.surface),
               border: TableBorder.all(color: AppColors.border.withOpacity(0.2), width: 1),
-              columns: const [
+              columns: [
                 DataColumn(label: Text('Name', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold))),
                 DataColumn(label: Text('Description', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold))),
                 DataColumn(label: Text('Status', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold))),
@@ -641,13 +641,13 @@ class _TechnologyMasterWidgetState extends State<TechnologyMasterWidget> {
               rows: techs.map((tech) {
                 return DataRow(
                   cells: [
-                    DataCell(Text(tech.name, style: const TextStyle(color: AppColors.textPrimary))),
+                    DataCell(Text(tech.name, style: TextStyle(color: AppColors.textPrimary))),
                     DataCell(
                       Container(
                         constraints: const BoxConstraints(maxWidth: 300),
                         child: Text(
                           tech.description.isNotEmpty ? tech.description : '-',
-                          style: const TextStyle(color: AppColors.textSecondary),
+                          style: TextStyle(color: AppColors.textSecondary),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -738,7 +738,7 @@ class _ShimmerCardState extends State<_ShimmerCard> with SingleTickerProviderSta
             color: AppColors.surface,
             margin: const EdgeInsets.only(bottom: AppSpacing.md),
             shape: RoundedRectangleBorder(
-              side: const BorderSide(color: AppColors.border),
+              side: BorderSide(color: AppColors.border),
               borderRadius: BorderRadius.circular(AppDimensions.cardRadius),
             ),
             child: Padding(

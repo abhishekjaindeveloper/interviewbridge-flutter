@@ -45,7 +45,7 @@ class _EvaluationPageState extends State<EvaluationPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           AppConstants.evaluationPageTitle,
           style: AppTypography.headingMedium,
         ),
@@ -54,10 +54,11 @@ class _EvaluationPageState extends State<EvaluationPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.of(context).pushNamedAndRemoveUntil(
-              RouteConstants.sessionStart,
-              (route) => false,
-            );
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            } else {
+              Navigator.of(context).pushReplacementNamed(RouteConstants.home);
+            }
           },
         ),
       ),
@@ -220,7 +221,7 @@ class _EvaluationPageState extends State<EvaluationPage> {
           padding: const EdgeInsets.all(AppSpacing.md),
           child: _buildAverageScoreHeader(state.averageScore),
         ),
-        const Divider(color: AppColors.border, height: 1),
+        Divider(color: AppColors.border, height: 1),
         Expanded(
           child: ListView.separated(
             padding: const EdgeInsets.all(AppSpacing.md),
@@ -304,7 +305,7 @@ class _EvaluationPageState extends State<EvaluationPage> {
                           size: 20,
                         )
                       else if (q.questionStatus.toUpperCase() == 'ANSWERED')
-                        const Icon(
+                        Icon(
                           Icons.circle_outlined,
                           color: AppColors.textSecondary,
                           size: 20,
@@ -316,7 +317,7 @@ class _EvaluationPageState extends State<EvaluationPage> {
             },
           ),
         ),
-        const Divider(color: AppColors.border, height: 1),
+        Divider(color: AppColors.border, height: 1),
         Padding(
           padding: const EdgeInsets.all(AppSpacing.md),
           child: _buildNavigationButtons(context),
@@ -608,19 +609,37 @@ class _EvaluationPageState extends State<EvaluationPage> {
         CustomButton(
           text: AppConstants.closeSessionButton,
           onPressed: () {
-            Navigator.of(context).pushNamedAndRemoveUntil(
-              RouteConstants.sessionStart,
-              (route) => false,
-            );
+            bool hasHome = false;
+            Navigator.of(context).popUntil((route) {
+              if (route.settings.name == RouteConstants.home ||
+                  route.settings.name == RouteConstants.sessionStart) {
+                hasHome = true;
+                return true;
+              }
+              return false;
+            });
+            if (!hasHome) {
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                RouteConstants.home,
+                (route) => false,
+              );
+            }
           },
         ),
         const SizedBox(height: AppSpacing.sm),
         TextButton(
           onPressed: () {
-            Navigator.of(context).pushNamedAndRemoveUntil(
-              RouteConstants.sessionHistory,
-              (route) => false,
-            );
+            bool hasHistory = false;
+            Navigator.of(context).popUntil((route) {
+              if (route.settings.name == RouteConstants.sessionHistory) {
+                hasHistory = true;
+                return true;
+              }
+              return false;
+            });
+            if (!hasHistory) {
+              Navigator.of(context).pushReplacementNamed(RouteConstants.sessionHistory);
+            }
           },
           child: const Text(
             AppConstants.backToHistoryButton,

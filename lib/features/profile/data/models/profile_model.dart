@@ -7,6 +7,7 @@ class ProfileModel extends ProfileEntity {
     required super.userId,
     required super.name,
     required super.email,
+    required super.phoneNumber,
     required super.role,
     super.technology,
     super.experience,
@@ -17,6 +18,7 @@ class ProfileModel extends ProfileEntity {
       userId: json['userId'] as String? ?? '',
       name: json['name'] as String? ?? '',
       email: json['email'] as String? ?? '',
+      phoneNumber: json['phoneNumber'] as String? ?? '',
       role: json['role'] as String? ?? '',
       technology: json['technology'] != null
           ? TechnologyModel.fromJson(json['technology'] as Map<String, dynamic>)
@@ -32,6 +34,7 @@ class ProfileModel extends ProfileEntity {
       'userId': userId,
       'name': name,
       'email': email,
+      'phoneNumber': phoneNumber,
       'role': role,
       'technology': technology != null ? (technology as TechnologyModel).toJson() : null,
       'experience': experience != null ? (experience as ExperienceModel).toJson() : null,
@@ -43,6 +46,7 @@ class ProfileModel extends ProfileEntity {
       userId: userId,
       name: name,
       email: email,
+      phoneNumber: phoneNumber,
       role: role,
       technology: technology,
       experience: experience,

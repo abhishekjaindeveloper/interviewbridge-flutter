@@ -48,6 +48,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       final user = await loginUseCase(event.email, event.password);
       emit(Authenticated(user));
+    } on UserRejectedException catch (e) {
+      emit(AuthRejected(e.rejectionReason));
     } on AppException catch (e) {
       emit(AuthError(e.message));
     } catch (e) {
@@ -67,6 +69,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         event.termsAccepted,
       );
       emit(Authenticated(user));
+    } on PhoneAlreadyRegisteredException catch (e) {
+      emit(PhoneAlreadyRegistered(e.message));
+    } on EmailAlreadyRegisteredException catch (e) {
+      emit(EmailAlreadyRegistered(e.message));
     } on AppException catch (e) {
       emit(AuthError(e.message));
     } catch (e) {

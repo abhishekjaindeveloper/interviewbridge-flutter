@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/utils/login_input_formatter.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
-import '../../../../core/widgets/error_dialog.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../core/routes/route_constants.dart';
 import '../bloc/auth_bloc.dart';
@@ -28,15 +28,46 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
   AutovalidateMode _autovalidateMode = AutovalidateMode.disabled;
   bool _obscurePassword = true;
+  String? _emailError;
+  String? _passwordError;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController.addListener(_onEmailChanged);
+    _passwordController.addListener(_onPasswordChanged);
+  }
+
+  void _onEmailChanged() {
+    if (_emailError != null) {
+      setState(() {
+        _emailError = null;
+      });
+    }
+  }
+
+  void _onPasswordChanged() {
+    if (_passwordError != null) {
+      setState(() {
+        _passwordError = null;
+      });
+    }
+  }
 
   @override
   void dispose() {
+    _emailController.removeListener(_onEmailChanged);
+    _passwordController.removeListener(_onPasswordChanged);
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
   void _onLoginPressed() {
+    setState(() {
+      _emailError = null;
+      _passwordError = null;
+    });
     if (_formKey.currentState!.validate()) {
       context.read<AuthBloc>().add(
             LoginRequested(
@@ -58,15 +89,15 @@ class _LoginPageState extends State<LoginPage> {
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthError) {
-            final isNetworkError = state.message == AppConstants.noConnection;
-            ErrorDialog.show(
-              context: context,
-              title: isNetworkError
-                  ? AppConstants.dialogTitleNetworkError
-                  : AppConstants.dialogTitleAuthError,
-              message: state.message,
-              type: DialogType.error,
-            );
+            if (state.message == AppConstants.errorUserNotFound) {
+              setState(() {
+                _emailError = AppConstants.errorUserNotFound;
+              });
+            } else if (state.message == AppConstants.errorIncorrectPassword) {
+              setState(() {
+                _passwordError = AppConstants.errorIncorrectPassword;
+              });
+            }
           }
         },
         builder: (context, state) {
@@ -93,6 +124,10 @@ class _LoginPageState extends State<LoginPage> {
                       validator: Validators.validateEmailOrPhone,
                       autovalidateMode: _autovalidateMode,
                       enabled: !isLoading,
+                      errorText: _emailError,
+                      inputFormatters: [
+                        LoginInputFormatter(),
+                      ],
                     ),
                     const SizedBox(height: AppSpacing.md),
                     CustomTextField(
@@ -103,6 +138,7 @@ class _LoginPageState extends State<LoginPage> {
                       validator: Validators.validatePassword,
                       autovalidateMode: _autovalidateMode,
                       enabled: !isLoading,
+                      errorText: _passwordError,
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscurePassword ? Icons.visibility_off : Icons.visibility,

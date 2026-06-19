@@ -7,6 +7,7 @@ class AdminEntity extends Equatable {
   final String? phoneNumber;
   final String role;
   final String approvalStatus;
+  final bool isActive;
   final DateTime? createdAt;
 
   const AdminEntity({
@@ -16,6 +17,7 @@ class AdminEntity extends Equatable {
     this.phoneNumber,
     required this.role,
     required this.approvalStatus,
+    this.isActive = true,
     this.createdAt,
   });
 
@@ -27,6 +29,7 @@ class AdminEntity extends Equatable {
         phoneNumber,
         role,
         approvalStatus,
+        isActive,
         createdAt,
       ];
 }

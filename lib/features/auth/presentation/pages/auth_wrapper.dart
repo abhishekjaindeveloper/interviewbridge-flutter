@@ -5,8 +5,8 @@ import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
 import 'login_page.dart';
 import 'pending_approval_page.dart';
-import '../../../profile/presentation/pages/profile_page.dart';
 import '../../../admin/presentation/pages/admin_dashboard_page.dart';
+import '../../../practice_session/presentation/pages/practice_session_page.dart';
 import '../../../practice_session/presentation/bloc/practice_session_bloc.dart';
 import '../../../practice_session/presentation/bloc/practice_session_event.dart';
 import '../../../question/presentation/bloc/question_bloc.dart';
@@ -31,6 +31,8 @@ class AuthWrapper extends StatefulWidget {
 }
 
 class _AuthWrapperState extends State<AuthWrapper> {
+  bool _hasInitialCheckCompleted = false;
+
   @override
   void initState() {
     super.initState();
@@ -41,6 +43,18 @@ class _AuthWrapperState extends State<AuthWrapper> {
   Widget build(BuildContext context) {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
+        if (state is Unauthenticated ||
+            state is Authenticated ||
+            state is AuthError ||
+            state is AuthRejected ||
+            state is PhoneAlreadyRegistered) {
+          if (!_hasInitialCheckCompleted) {
+            setState(() {
+              _hasInitialCheckCompleted = true;
+            });
+          }
+        }
+
         if (state is Unauthenticated) {
           context.read<PracticeSessionBloc>().add(ResetSessionState());
           context.read<QuestionBloc>().add(ResetQuestionState());
@@ -49,19 +63,42 @@ class _AuthWrapperState extends State<AuthWrapper> {
           context.read<TechnologyBloc>().add(ResetTechnologyState());
           context.read<ExperienceBloc>().add(ResetExperienceState());
         } else if (state is AuthError) {
-          final isNetworkError = state.message == AppConstants.noConnection;
+          final msg = state.message;
+          final isInlineError = msg == AppConstants.errorUserNotFound ||
+              msg == AppConstants.errorIncorrectPassword;
+
+          if (!isInlineError) {
+            final isNetworkError = msg == AppConstants.noConnection;
+            final isPendingError = msg == AppConstants.pendingUserMessage;
+            ErrorDialog.show(
+              context: context,
+              title: isNetworkError
+                  ? AppConstants.dialogTitleNetworkError
+                  : (isPendingError
+                      ? AppConstants.pendingUserTitle
+                      : AppConstants.dialogTitleAuthError),
+              message: msg,
+              type: DialogType.error,
+            );
+          }
+        } else if (state is AuthRejected) {
+          final reason = state.rejectionReason;
+          final isFallback = reason.isEmpty ||
+              reason == 'N/A' ||
+              reason == AppConstants.notAvailablePlaceholder;
+
           ErrorDialog.show(
             context: context,
-            title: isNetworkError
-                ? AppConstants.dialogTitleNetworkError
-                : AppConstants.dialogTitleAuthError,
-            message: state.message,
+            title: AppConstants.rejectionRequestRejectedTitle,
+            message: isFallback
+                ? AppConstants.rejectionRequestFallbackMessage
+                : '${AppConstants.rejectionReasonPrefix}$reason\n\n${AppConstants.rejectionDialogContactSupport}',
             type: DialogType.error,
           );
         }
       },
       builder: (context, state) {
-        if (state is AuthInitial || state is AuthLoading) {
+        if (state is AuthInitial || (state is AuthLoading && !_hasInitialCheckCompleted)) {
           return const Scaffold(
             body: LoadingIndicator(),
           );
@@ -72,7 +109,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
           if (state.user.role == 'ROLE_ADMIN') {
             return const AdminDashboardPage();
           }
-          return const ProfilePage();
+          return const PracticeSessionPage();
         } else {
           return const LoginPage();
         }

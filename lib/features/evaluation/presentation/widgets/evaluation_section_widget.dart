@@ -108,7 +108,7 @@ class _EvaluationSectionWidgetState extends State<EvaluationSectionWidget>
                   AnimatedRotation(
                     turns: _isExpanded ? 0.5 : 0.0,
                     duration: const Duration(milliseconds: 200),
-                    child: const Icon(
+                    child: Icon(
                       Icons.keyboard_arrow_down_rounded,
                       color: AppColors.textSecondary,
                     ),
@@ -129,7 +129,7 @@ class _EvaluationSectionWidgetState extends State<EvaluationSectionWidget>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Divider(color: AppColors.border, height: 1),
+                  Divider(color: AppColors.border, height: 1),
                   const SizedBox(height: AppSpacing.md),
                   SelectableText(
                     widget.content,

@@ -9,6 +9,7 @@ import '../../../../core/routes/route_constants.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/widgets/loading_indicator.dart';
+import '../../../../core/widgets/user_drawer.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
 import '../../../auth/presentation/bloc/auth_event.dart';
@@ -72,21 +73,20 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           AppConstants.profileTitle,
           style: AppTypography.headingMedium,
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout, color: AppColors.error),
-            onPressed: () {
-              context.read<AuthBloc>().add(LogoutRequested());
-            },
-          ),
-        ],
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
       ),
+      drawer: const UserDrawer(currentRoute: RouteConstants.profile),
       body: BlocConsumer<ProfileBloc, ProfileState>(
         listener: (context, state) {
           if (state is ProfileUpdateSuccess) {
@@ -215,12 +215,12 @@ class _ProfilePageState extends State<ProfilePage> {
                                     },
                               style: OutlinedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-                                side: const BorderSide(color: AppColors.border),
+                                side: BorderSide(color: AppColors.border),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(AppDimensions.inputRadius),
                                 ),
                               ),
-                              child: const Text(
+                              child: Text(
                                 AppConstants.cancelChangesButton,
                                 style: TextStyle(color: AppColors.textPrimary),
                               ),
@@ -260,7 +260,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
 
                     const SizedBox(height: AppSpacing.lg),
-                    const Divider(color: AppColors.border),
+                    Divider(color: AppColors.border),
                     const SizedBox(height: AppSpacing.lg),
 
                     // Technology & Experience Display
@@ -289,7 +289,11 @@ class _ProfilePageState extends State<ProfilePage> {
                         onPressed: isProfileLoading || isUpdating
                             ? null
                             : () {
-                                Navigator.of(context).pushNamed(RouteConstants.sessionStart);
+                                if (Navigator.of(context).canPop()) {
+                                  Navigator.of(context).pop();
+                                } else {
+                                  Navigator.of(context).pushReplacementNamed(RouteConstants.home);
+                                }
                               },
                       ),
                       const SizedBox(height: AppSpacing.md),
@@ -301,12 +305,12 @@ class _ProfilePageState extends State<ProfilePage> {
                               },
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-                          side: const BorderSide(color: AppColors.border),
+                          side: BorderSide(color: AppColors.border),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(AppDimensions.inputRadius),
                           ),
                         ),
-                        child: const Text(
+                        child: Text(
                           AppConstants.changeSelectionButton,
                           style: TextStyle(color: AppColors.textPrimary),
                         ),

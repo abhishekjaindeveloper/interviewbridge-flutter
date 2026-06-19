@@ -104,7 +104,7 @@ class ErrorDialog extends StatelessWidget {
       backgroundColor: AppColors.surface,
       elevation: 0,
       shape: RoundedRectangleBorder(
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: AppColors.border),
         borderRadius: BorderRadius.circular(AppDimensions.cardRadius),
       ),
       child: Container(

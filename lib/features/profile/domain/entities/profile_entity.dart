@@ -6,6 +6,7 @@ class ProfileEntity extends Equatable {
   final String userId;
   final String name;
   final String email;
+  final String phoneNumber;
   final String role;
   final TechnologyEntity? technology;
   final ExperienceEntity? experience;
@@ -14,11 +15,12 @@ class ProfileEntity extends Equatable {
     required this.userId,
     required this.name,
     required this.email,
+    required this.phoneNumber,
     required this.role,
     this.technology,
     this.experience,
   });
 
   @override
-  List<Object?> get props => [userId, name, email, role, technology, experience];
+  List<Object?> get props => [userId, name, email, phoneNumber, role, technology, experience];
 }

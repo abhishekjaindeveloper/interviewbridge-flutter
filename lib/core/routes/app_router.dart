@@ -6,6 +6,7 @@ import '../../features/auth/presentation/pages/landing_page.dart';
 import '../../features/auth/presentation/pages/terms_conditions_page.dart';
 import '../../features/auth/presentation/pages/privacy_policy_page.dart';
 import '../../features/profile/presentation/pages/technology_experience_selection_page.dart';
+import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/practice_session/presentation/pages/practice_session_page.dart';
 import '../../features/practice_session/presentation/pages/session_history_page.dart';
 import '../../features/question/presentation/pages/question_page.dart';
@@ -54,6 +55,11 @@ class AppRouter {
         return MaterialPageRoute(
           settings: settings,
           builder: (_) => const TechnologyExperienceSelectionPage(),
+        );
+      case RouteConstants.profile:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const ProfilePage(),
         );
       case RouteConstants.sessionStart:
         return MaterialPageRoute(

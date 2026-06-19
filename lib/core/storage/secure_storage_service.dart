@@ -50,6 +50,14 @@ class SecureStorageService {
     return await _storage.read(key: StorageConstants.keyApprovalStatus);
   }
 
+  Future<void> writeUserPhone(String phone) async {
+    await _storage.write(key: StorageConstants.keyUserPhone, value: phone);
+  }
+
+  Future<String?> readUserPhone() async {
+    return await _storage.read(key: StorageConstants.keyUserPhone);
+  }
+
   Future<void> clearAll() async {
     await _storage.deleteAll();
   }

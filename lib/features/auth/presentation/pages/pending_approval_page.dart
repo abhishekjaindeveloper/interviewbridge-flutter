@@ -59,13 +59,13 @@ class PendingApprovalPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.xl),
-                  const Text(
+                  Text(
                     AppConstants.pendingTitle,
                     style: AppTypography.headingMedium,
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  const Text(
+                  Text(
                     AppConstants.pendingSubtitle,
                     style: AppTypography.bodyMedium,
                     textAlign: TextAlign.center,

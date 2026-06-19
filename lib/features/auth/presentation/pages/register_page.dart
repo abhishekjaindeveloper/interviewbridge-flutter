@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-//import 'package:flutter/gestures.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -36,9 +36,36 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _termsAccepted = false;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  String? _emailError;
+  String? _phoneError;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController.addListener(_onEmailChanged);
+    _phoneController.addListener(_onPhoneChanged);
+  }
+
+  void _onEmailChanged() {
+    if (_emailError != null) {
+      setState(() {
+        _emailError = null;
+      });
+    }
+  }
+
+  void _onPhoneChanged() {
+    if (_phoneError != null) {
+      setState(() {
+        _phoneError = null;
+      });
+    }
+  }
 
   @override
   void dispose() {
+    _emailController.removeListener(_onEmailChanged);
+    _phoneController.removeListener(_onPhoneChanged);
     _nameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
@@ -48,6 +75,10 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   void _onRegisterPressed() {
+    setState(() {
+      _emailError = null;
+      _phoneError = null;
+    });
     if (_formKey.currentState!.validate()) {
       context.read<AuthBloc>().add(
             RegisterRequested(
@@ -73,6 +104,14 @@ class _RegisterPageState extends State<RegisterPage> {
         listener: (context, state) {
           if (state is Authenticated) {
             Navigator.of(context).pop();
+          } else if (state is PhoneAlreadyRegistered) {
+            setState(() {
+              _phoneError = AppConstants.duplicatePhoneValidationMessage;
+            });
+          } else if (state is EmailAlreadyRegistered) {
+            setState(() {
+              _emailError = AppConstants.duplicateEmailValidationMessage;
+            });
           } else if (state is AuthError) {
             final isNetworkError = state.message == AppConstants.noConnection;
             ErrorDialog.show(
@@ -118,6 +157,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       validator: Validators.validateEmail,
                       autovalidateMode: _autovalidateMode,
                       enabled: !isLoading,
+                      errorText: _emailError,
                     ),
                     const SizedBox(height: AppSpacing.md),
                     CustomTextField(
@@ -128,6 +168,11 @@ class _RegisterPageState extends State<RegisterPage> {
                       validator: Validators.validatePhone,
                       autovalidateMode: _autovalidateMode,
                       enabled: !isLoading,
+                      errorText: _phoneError,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        LengthLimitingTextInputFormatter(10),
+                      ],
                     ),
                     const SizedBox(height: AppSpacing.md),
                     CustomTextField(
@@ -207,7 +252,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                         },
                                   activeColor: AppColors.primary,
                                   checkColor: AppColors.white,
-                                  side: const BorderSide(color: AppColors.border),
+                                  side: BorderSide(color: AppColors.border),
                                 ),
                                 Expanded(
                                   child: Wrap(

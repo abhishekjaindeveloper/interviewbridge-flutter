@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -8,6 +9,7 @@ import '../../../../core/theme/app_dimensions.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/routes/route_constants.dart';
 import '../../../../core/widgets/custom_button.dart';
+import '../../../../core/widgets/user_drawer.dart';
 import '../../../profile/presentation/bloc/profile_bloc.dart';
 import '../../../profile/presentation/bloc/profile_state.dart';
 import '../bloc/practice_session_bloc.dart';
@@ -101,6 +103,114 @@ class _PracticeSessionPageState extends State<PracticeSessionPage> {
     );
   }
 
+  Future<bool?> _showExitConfirmationDialog(BuildContext context) {
+    return showGeneralDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: '',
+      barrierColor: AppColors.black.withValues(alpha: 0.5),
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (dialogContext, anim1, anim2) {
+        return Dialog(
+          backgroundColor: AppColors.surface,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            side: BorderSide(color: AppColors.border),
+            borderRadius: BorderRadius.circular(AppDimensions.cardRadius),
+          ),
+          child: Container(
+            constraints: const BoxConstraints(
+              maxWidth: AppDimensions.maxContentWidth - 100,
+            ),
+            padding: const EdgeInsets.all(AppSpacing.xl),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: AppDimensions.opacityLow),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.exit_to_app_rounded,
+                    color: AppColors.primary,
+                    size: AppDimensions.iconMedium,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                Text(
+                  AppConstants.exitTitle,
+                  style: AppTypography.headingSmall.copyWith(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  AppConstants.exitMessage,
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.xl),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.of(dialogContext).pop(false),
+                        child: Text(
+                          AppConstants.cancelButtonLabel,
+                          style: AppTypography.bodyLarge.copyWith(
+                            color: AppColors.textSecondary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(AppDimensions.inputRadius),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.of(dialogContext).pop(true);
+                        },
+                        child: Text(
+                          AppConstants.exitButtonLabel,
+                          style: AppTypography.bodyLarge.copyWith(
+                            color: AppColors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, anim1, anim2, child) {
+        final curve = CurvedAnimation(parent: anim1, curve: Curves.easeOutBack);
+        return ScaleTransition(
+          scale: curve,
+          child: FadeTransition(
+            opacity: anim1,
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final profileState = context.watch<ProfileBloc>().state;
@@ -120,265 +230,276 @@ class _PracticeSessionPageState extends State<PracticeSessionPage> {
       }
     }
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text(
-          AppConstants.practiceDashboardTitle,
-          style: AppTypography.headingMedium,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        final shouldExit = await _showExitConfirmationDialog(context);
+        if (shouldExit == true) {
+          SystemNavigator.pop();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppBar(
+          title: Text(
+            AppConstants.practiceDashboardTitle,
+            style: AppTypography.headingMedium,
+          ),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
         ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-      body: BlocConsumer<PracticeSessionBloc, PracticeSessionState>(
-        listener: (context, state) {
-          if (state is PracticeSessionCreated) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  AppConstants.practiceSessionCreatedToast,
-                  style: AppTypography.bodyMedium.copyWith(color: AppColors.white),
-                ),
-                backgroundColor: AppColors.success,
-              ),
-            );
-            // Trigger question generation immediately after creation
-            context.read<PracticeSessionBloc>().add(GenerateQuestionsRequested(state.session.id));
-          } else if (state is PracticeQuestionsGenerated) {
-            _showSummaryDialog(context, state.session);
-            // Reload history preview list
-            context.read<PracticeSessionBloc>().add(LoadSessionHistoryRequested());
-          } else if (state is PracticeSessionError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  state.message,
-                  style: AppTypography.bodyMedium.copyWith(color: AppColors.white),
-                ),
-                backgroundColor: AppColors.error,
-              ),
-            );
-            // Refresh preview if we failed in generating questions
-            context.read<PracticeSessionBloc>().add(LoadSessionHistoryRequested());
-          }
-        },
-        builder: (context, state) {
-          final isLoading = state is PracticeSessionLoading;
-
-          if (!isProfileComplete) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.xl),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.warning_amber_rounded,
-                      color: AppColors.warning,
-                      size: 64,
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    Text(
-                      AppConstants.incompleteProfileWarning,
-                      style: AppTypography.bodyLarge,
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: AppSpacing.xl),
-                    CustomButton(
-                      text: AppConstants.goToProfileSetupButton,
-                      onPressed: () {
-                        Navigator.of(context).pushNamed(RouteConstants.profileSetup);
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
-
-          List<PracticeSessionEntity> recentSessions = [];
-          if (state is PracticeSessionsLoaded) {
-            recentSessions = state.sessions.take(3).toList();
-          }
-
-          return SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Center(
-                child: Container(
-                  constraints: const BoxConstraints(
-                    maxWidth: AppDimensions.maxContentWidth,
+        drawer: const UserDrawer(currentRoute: RouteConstants.sessionStart),
+        body: BlocConsumer<PracticeSessionBloc, PracticeSessionState>(
+          listener: (context, state) {
+            if (state is PracticeSessionCreated) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    AppConstants.practiceSessionCreatedToast,
+                    style: AppTypography.bodyMedium.copyWith(color: AppColors.white),
                   ),
+                  backgroundColor: AppColors.success,
+                ),
+              );
+              // Trigger question generation immediately after creation
+              context.read<PracticeSessionBloc>().add(GenerateQuestionsRequested(state.session.id));
+            } else if (state is PracticeQuestionsGenerated) {
+              _showSummaryDialog(context, state.session);
+              // Reload history preview list
+              context.read<PracticeSessionBloc>().add(LoadSessionHistoryRequested());
+            } else if (state is PracticeSessionError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    state.message,
+                    style: AppTypography.bodyMedium.copyWith(color: AppColors.white),
+                  ),
+                  backgroundColor: AppColors.error,
+                ),
+              );
+              // Refresh preview if we failed in generating questions
+              context.read<PracticeSessionBloc>().add(LoadSessionHistoryRequested());
+            }
+          },
+          builder: (context, state) {
+            final isLoading = state is PracticeSessionLoading;
+
+            if (!isProfileComplete) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.xl),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      const Icon(
+                        Icons.warning_amber_rounded,
+                        color: AppColors.warning,
+                        size: 64,
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
                       Text(
-                        AppConstants.practiceDashboardSubtitle,
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
+                        AppConstants.incompleteProfileWarning,
+                        style: AppTypography.bodyLarge,
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: AppSpacing.xl),
+                      CustomButton(
+                        text: AppConstants.goToProfileSetupButton,
+                        onPressed: () {
+                          Navigator.of(context).pushNamed(RouteConstants.profileSetup);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
 
-                      // Configuration Card
-                      Container(
-                        padding: const EdgeInsets.all(AppSpacing.lg),
-                        decoration: BoxDecoration(
-                          color: AppColors.surface,
-                          borderRadius: BorderRadius.circular(AppDimensions.cardRadius),
-                          border: Border.all(
-                            color: AppColors.border.withOpacity(AppDimensions.opacityBorder),
+            List<PracticeSessionEntity> recentSessions = [];
+            if (state is PracticeSessionsLoaded) {
+              recentSessions = state.sessions.take(3).toList();
+            }
+
+            return SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: Center(
+                  child: Container(
+                    constraints: const BoxConstraints(
+                      maxWidth: AppDimensions.maxContentWidth,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          AppConstants.practiceDashboardSubtitle,
+                          style: AppTypography.bodyMedium.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: AppSpacing.xl),
+
+                        // Configuration Card
+                        Container(
+                          padding: const EdgeInsets.all(AppSpacing.lg),
+                          decoration: BoxDecoration(
+                            color: AppColors.surface,
+                            borderRadius: BorderRadius.circular(AppDimensions.cardRadius),
+                            border: Border.all(
+                              color: AppColors.border.withOpacity(AppDimensions.opacityBorder),
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Text(
+                                AppConstants.activeSelectionsTitle,
+                                style: AppTypography.bodyLarge.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    AppConstants.technologyLabel,
+                                    style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+                                  ),
+                                  Text(
+                                    techName,
+                                    style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: AppSpacing.sm),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    AppConstants.experienceLevelLabel,
+                                    style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+                                  ),
+                                  Text(
+                                    expLabel,
+                                    style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: AppSpacing.lg),
+                              Divider(color: AppColors.border),
+                              const SizedBox(height: AppSpacing.lg),
+                              Text(
+                                AppConstants.totalQuestionsSelectorLabel,
+                                style: AppTypography.bodyMedium.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: AppConstants.questionCountPresets.map((count) {
+                                  final isSelected = _selectedQuestionCount == count;
+                                  return ChoiceChip(
+                                    label: Text('$count'),
+                                    selected: isSelected,
+                                    selectedColor: AppColors.primary,
+                                    backgroundColor: AppColors.surfaceLight,
+                                    labelStyle: TextStyle(
+                                      color: isSelected ? AppColors.white : AppColors.textPrimary,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    onSelected: isLoading
+                                        ? null
+                                        : (selected) {
+                                            if (selected) {
+                                              setState(() {
+                                                _selectedQuestionCount = count;
+                                              });
+                                            }
+                                          },
+                                  );
+                                }).toList(),
+                              ),
+                              const SizedBox(height: AppSpacing.xl),
+                              CustomButton(
+                                text: AppConstants.startPracticeButton,
+                                onPressed: isLoading ? null : () => _onStartSessionPressed(techId, expId),
+                                isLoading: isLoading,
+                              ),
+                            ],
                           ),
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
+
+                        const SizedBox(height: AppSpacing.xxl),
+                        Divider(color: AppColors.border),
+                        const SizedBox(height: AppSpacing.xl),
+
+                        // Recent Sessions Preview Section
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              AppConstants.activeSelectionsTitle,
+                              AppConstants.recentSessionsLabel,
                               style: AppTypography.bodyLarge.copyWith(
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            const SizedBox(height: AppSpacing.md),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  AppConstants.technologyLabel,
-                                  style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
-                                ),
-                                Text(
-                                  techName,
-                                  style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: AppSpacing.sm),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  AppConstants.experienceLevelLabel,
-                                  style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
-                                ),
-                                Text(
-                                  expLabel,
-                                  style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: AppSpacing.lg),
-                            const Divider(color: AppColors.border),
-                            const SizedBox(height: AppSpacing.lg),
-                            Text(
-                              AppConstants.totalQuestionsSelectorLabel,
-                              style: AppTypography.bodyMedium.copyWith(
-                                fontWeight: FontWeight.bold,
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pushNamed(RouteConstants.sessionHistory);
+                              },
+                              child: const Text(
+                                AppConstants.viewAllHistoryButton,
+                                style: TextStyle(color: AppColors.primaryLight),
                               ),
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: AppConstants.questionCountPresets.map((count) {
-                                final isSelected = _selectedQuestionCount == count;
-                                return ChoiceChip(
-                                  label: Text('$count'),
-                                  selected: isSelected,
-                                  selectedColor: AppColors.primary,
-                                  backgroundColor: AppColors.surfaceLight,
-                                  labelStyle: TextStyle(
-                                    color: isSelected ? AppColors.white : AppColors.textPrimary,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  onSelected: isLoading
-                                      ? null
-                                      : (selected) {
-                                          if (selected) {
-                                            setState(() {
-                                              _selectedQuestionCount = count;
-                                            });
-                                          }
-                                        },
-                                );
-                              }).toList(),
-                            ),
-                            const SizedBox(height: AppSpacing.xl),
-                            CustomButton(
-                              text: AppConstants.startPracticeButton,
-                              onPressed: isLoading ? null : () => _onStartSessionPressed(techId, expId),
-                              isLoading: isLoading,
                             ),
                           ],
                         ),
-                      ),
+                        const SizedBox(height: AppSpacing.md),
 
-                      const SizedBox(height: AppSpacing.xxl),
-                      const Divider(color: AppColors.border),
-                      const SizedBox(height: AppSpacing.xl),
-
-                      // Recent Sessions Preview Section
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            AppConstants.recentSessionsLabel,
-                            style: AppTypography.bodyLarge.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pushNamed(RouteConstants.sessionHistory);
-                            },
-                            child: const Text(
-                              AppConstants.viewAllHistoryButton,
-                              style: TextStyle(color: AppColors.primaryLight),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-
-                      if (recentSessions.isEmpty && state is! PracticeSessionLoading) ...[
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
-                          child: Center(
-                            child: Text(
-                              AppConstants.noRecentSessionsText,
-                              style: AppTypography.bodyMedium.copyWith(
-                                color: AppColors.textSecondary,
+                        if (recentSessions.isEmpty && state is! PracticeSessionLoading) ...[
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
+                            child: Center(
+                              child: Text(
+                                AppConstants.noRecentSessionsText,
+                                style: AppTypography.bodyMedium.copyWith(
+                                  color: AppColors.textSecondary,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ] else ...[
-                        ListView.separated(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: recentSessions.length,
-                          separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.md),
-                          itemBuilder: (context, index) {
-                            final session = recentSessions[index];
-                            return SessionCardWidget(
-                              session: session,
-                              onTap: () {
-                                Navigator.of(context).pushNamed(
-                                  RouteConstants.sessionActive,
-                                  arguments: session.id,
-                                );
-                              },
-                            );
-                          },
-                        ),
+                        ] else ...[
+                          ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: recentSessions.length,
+                            separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.md),
+                            itemBuilder: (context, index) {
+                              final session = recentSessions[index];
+                              return SessionCardWidget(
+                                session: session,
+                                onTap: () {
+                                  Navigator.of(context).pushNamed(
+                                    RouteConstants.sessionActive,
+                                    arguments: session.id,
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

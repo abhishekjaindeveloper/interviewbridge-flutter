@@ -71,7 +71,7 @@ class _ExperienceMasterWidgetState extends State<ExperienceMasterWidget> {
               backgroundColor: AppColors.surface,
               elevation: 0,
               shape: RoundedRectangleBorder(
-                side: const BorderSide(color: AppColors.border),
+                side: BorderSide(color: AppColors.border),
                 borderRadius: BorderRadius.circular(AppDimensions.cardRadius),
               ),
               child: Container(
@@ -183,7 +183,7 @@ class _ExperienceMasterWidgetState extends State<ExperienceMasterWidget> {
           backgroundColor: AppColors.surface,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            side: const BorderSide(color: AppColors.border),
+            side: BorderSide(color: AppColors.border),
             borderRadius: BorderRadius.circular(AppDimensions.cardRadius),
           ),
           child: Container(
@@ -397,14 +397,14 @@ class _ExperienceMasterWidgetState extends State<ExperienceMasterWidget> {
       color: AppColors.surface,
       elevation: 0,
       shape: RoundedRectangleBorder(
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: AppColors.border),
         borderRadius: BorderRadius.circular(AppDimensions.inputRadius),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
         child: Row(
           children: [
-            const Icon(Icons.search, color: AppColors.textSecondary),
+            Icon(Icons.search, color: AppColors.textSecondary),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: TextField(
@@ -422,7 +422,7 @@ class _ExperienceMasterWidgetState extends State<ExperienceMasterWidget> {
             ),
             if (_searchController.text.isNotEmpty)
               IconButton(
-                icon: const Icon(Icons.clear, color: AppColors.textSecondary),
+                icon: Icon(Icons.clear, color: AppColors.textSecondary),
                 onPressed: () {
                   _searchController.clear();
                 },
@@ -452,7 +452,7 @@ class _ExperienceMasterWidgetState extends State<ExperienceMasterWidget> {
               color: AppColors.surfaceLight.withOpacity(AppDimensions.opacityLow),
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               Icons.trending_down,
               color: AppColors.textSecondary,
               size: AppDimensions.iconLarge,
@@ -548,7 +548,7 @@ class _ExperienceMasterWidgetState extends State<ExperienceMasterWidget> {
           color: AppColors.surface,
           margin: const EdgeInsets.only(bottom: AppSpacing.md),
           shape: RoundedRectangleBorder(
-            side: const BorderSide(color: AppColors.border),
+            side: BorderSide(color: AppColors.border),
             borderRadius: BorderRadius.circular(AppDimensions.cardRadius),
           ),
           child: Padding(
@@ -598,7 +598,7 @@ class _ExperienceMasterWidgetState extends State<ExperienceMasterWidget> {
     return Card(
       color: AppColors.surface,
       shape: RoundedRectangleBorder(
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: AppColors.border),
         borderRadius: BorderRadius.circular(AppDimensions.cardRadius),
       ),
       child: ClipRRect(
@@ -614,7 +614,7 @@ class _ExperienceMasterWidgetState extends State<ExperienceMasterWidget> {
               headingRowColor: MaterialStateProperty.all(AppColors.surfaceLight.withOpacity(0.3)),
               dataRowColor: MaterialStateProperty.all(AppColors.surface),
               border: TableBorder.all(color: AppColors.border.withOpacity(0.2), width: 1),
-              columns: const [
+              columns: [
                 DataColumn(label: Text('Experience Label', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold))),
                 DataColumn(label: Text('Status', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold))),
                 DataColumn(label: Text('Actions', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold))),
@@ -622,7 +622,7 @@ class _ExperienceMasterWidgetState extends State<ExperienceMasterWidget> {
               rows: exps.map((exp) {
                 return DataRow(
                   cells: [
-                    DataCell(Text(exp.experienceLabel, style: const TextStyle(color: AppColors.textPrimary))),
+                    DataCell(Text(exp.experienceLabel, style: TextStyle(color: AppColors.textPrimary))),
                     DataCell(_buildStatusBadge(exp.isActive)),
                     DataCell(
                       Row(
@@ -709,7 +709,7 @@ class _ShimmerCardState extends State<_ShimmerCard> with SingleTickerProviderSta
             color: AppColors.surface,
             margin: const EdgeInsets.only(bottom: AppSpacing.md),
             shape: RoundedRectangleBorder(
-              side: const BorderSide(color: AppColors.border),
+              side: BorderSide(color: AppColors.border),
               borderRadius: BorderRadius.circular(AppDimensions.cardRadius),
             ),
             child: Padding(

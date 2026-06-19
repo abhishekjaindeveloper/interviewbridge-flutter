@@ -15,4 +15,6 @@ class RouteConstants {
   static const String landing = '/landing';
   static const String termsConditions = '/terms-conditions';
   static const String privacyPolicy = '/privacy-policy';
+  static const String profile = '/profile';
 }
+

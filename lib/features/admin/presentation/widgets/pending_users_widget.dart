@@ -7,6 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_dimensions.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/widgets/error_dialog.dart';
+import '../../../../core/widgets/custom_text_field.dart';
 import '../bloc/admin_bloc.dart';
 import '../bloc/admin_event.dart';
 import '../bloc/admin_state.dart';
@@ -42,6 +43,34 @@ class _PendingUsersWidgetState extends State<PendingUsersWidget> {
 
   void _confirmAction(BuildContext context, AdminEntity user, bool isApproval) {
     final adminBloc = context.read<AdminBloc>();
+    if (!isApproval) {
+      showGeneralDialog(
+        context: context,
+        barrierDismissible: true,
+        barrierLabel: '',
+        barrierColor: AppColors.black.withOpacity(0.5),
+        transitionDuration: const Duration(milliseconds: 300),
+        pageBuilder: (context, anim1, anim2) {
+          return _RejectUserDialog(
+            user: user,
+            onReject: (reason) {
+              adminBloc.add(RejectUser(user.id, reason));
+            },
+          );
+        },
+        transitionBuilder: (context, anim1, anim2, child) {
+          final curve = CurvedAnimation(parent: anim1, curve: Curves.easeOutBack);
+          return ScaleTransition(
+            scale: curve,
+            child: FadeTransition(
+              opacity: anim1,
+              child: child,
+            ),
+          );
+        },
+      );
+      return;
+    }
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
@@ -53,7 +82,7 @@ class _PendingUsersWidgetState extends State<PendingUsersWidget> {
           backgroundColor: AppColors.surface,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            side: const BorderSide(color: AppColors.border),
+            side: BorderSide(color: AppColors.border),
             borderRadius: BorderRadius.circular(AppDimensions.cardRadius),
           ),
           child: Container(
@@ -124,7 +153,7 @@ class _PendingUsersWidgetState extends State<PendingUsersWidget> {
                           if (isApproval) {
                             adminBloc.add(ApproveUser(user.id));
                           } else {
-                            adminBloc.add(RejectUser(user.id));
+                            adminBloc.add(RejectUser(user.id, ''));
                           }
                         },
                         child: Text(
@@ -263,7 +292,7 @@ class _PendingUsersWidgetState extends State<PendingUsersWidget> {
               color: AppColors.surfaceLight.withOpacity(AppDimensions.opacityLow),
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               Icons.people_outline,
               color: AppColors.textSecondary,
               size: AppDimensions.iconLarge,
@@ -358,7 +387,7 @@ class _PendingUsersWidgetState extends State<PendingUsersWidget> {
           color: AppColors.surface,
           margin: const EdgeInsets.only(bottom: AppSpacing.md),
           shape: RoundedRectangleBorder(
-            side: const BorderSide(color: AppColors.border),
+            side: BorderSide(color: AppColors.border),
             borderRadius: BorderRadius.circular(AppDimensions.cardRadius),
           ),
           child: Padding(
@@ -466,7 +495,7 @@ class _PendingUsersWidgetState extends State<PendingUsersWidget> {
     return Card(
       color: AppColors.surface,
       shape: RoundedRectangleBorder(
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: AppColors.border),
         borderRadius: BorderRadius.circular(AppDimensions.cardRadius),
       ),
       child: ClipRRect(
@@ -482,7 +511,7 @@ class _PendingUsersWidgetState extends State<PendingUsersWidget> {
               headingRowColor: MaterialStateProperty.all(AppColors.surfaceLight.withOpacity(0.3)),
               dataRowColor: MaterialStateProperty.all(AppColors.surface),
               border: TableBorder.all(color: AppColors.border.withOpacity(0.2), width: 1),
-              columns: const [
+              columns: [
                 DataColumn(label: Text('Name', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold))),
                 DataColumn(label: Text('Email', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold))),
                 DataColumn(label: Text('Phone Number', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold))),
@@ -493,10 +522,10 @@ class _PendingUsersWidgetState extends State<PendingUsersWidget> {
               rows: users.map((user) {
                 return DataRow(
                   cells: [
-                    DataCell(Text(user.name, style: const TextStyle(color: AppColors.textPrimary))),
-                    DataCell(Text(user.email, style: const TextStyle(color: AppColors.textPrimary))),
-                    DataCell(Text(user.phoneNumber ?? 'N/A', style: const TextStyle(color: AppColors.textSecondary))),
-                    DataCell(Text(_formatDate(user.createdAt), style: const TextStyle(color: AppColors.textSecondary))),
+                    DataCell(Text(user.name, style: TextStyle(color: AppColors.textPrimary))),
+                    DataCell(Text(user.email, style: TextStyle(color: AppColors.textPrimary))),
+                    DataCell(Text(user.phoneNumber ?? 'N/A', style: TextStyle(color: AppColors.textSecondary))),
+                    DataCell(Text(_formatDate(user.createdAt), style: TextStyle(color: AppColors.textSecondary))),
                     DataCell(
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
@@ -576,7 +605,7 @@ class _ShimmerCardState extends State<_ShimmerCard> with SingleTickerProviderSta
             color: AppColors.surface,
             margin: const EdgeInsets.only(bottom: AppSpacing.md),
             shape: RoundedRectangleBorder(
-              side: const BorderSide(color: AppColors.border),
+              side: BorderSide(color: AppColors.border),
               borderRadius: BorderRadius.circular(AppDimensions.cardRadius),
             ),
             child: Padding(
@@ -638,6 +667,134 @@ class _ShimmerCardState extends State<_ShimmerCard> with SingleTickerProviderSta
           ),
         );
       },
+    );
+  }
+}
+
+class _RejectUserDialog extends StatefulWidget {
+  final AdminEntity user;
+  final Function(String reason) onReject;
+
+  const _RejectUserDialog({
+    required this.user,
+    required this.onReject,
+  });
+
+  @override
+  State<_RejectUserDialog> createState() => _RejectUserDialogState();
+}
+
+class _RejectUserDialogState extends State<_RejectUserDialog> {
+  final _reasonController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  void dispose() {
+    _reasonController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: AppColors.surface,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        side: BorderSide(color: AppColors.border),
+        borderRadius: BorderRadius.circular(AppDimensions.cardRadius),
+      ),
+      child: Container(
+        constraints: const BoxConstraints(
+          maxWidth: AppDimensions.maxContentWidth,
+        ),
+        padding: const EdgeInsets.all(AppSpacing.xl),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                AppConstants.rejectUserTitle,
+                style: AppTypography.headingSmall.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                '${AppConstants.adminRejectConfirmMsg}\n\n${widget.user.name}\n${widget.user.email}',
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              CustomTextField(
+                controller: _reasonController,
+                labelText: AppConstants.rejectReasonLabel,
+                hintText: AppConstants.rejectReasonHint,
+                maxLines: 4,
+                maxLength: 500,
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return AppConstants.rejectReasonRequired;
+                  }
+                  if (value.trim().length < 10) {
+                    return AppConstants.rejectReasonTooShort;
+                  }
+                  if (value.trim().length > 500) {
+                    return AppConstants.rejectReasonTooLong;
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: Text(
+                        AppConstants.adminCancelButton,
+                        style: AppTypography.bodyLarge.copyWith(
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.error,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(AppDimensions.inputRadius),
+                        ),
+                      ),
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          Navigator.of(context).pop();
+                          widget.onReject(_reasonController.text.trim());
+                        }
+                      },
+                      child: Text(
+                        AppConstants.rejectUserButtonLabel,
+                        style: AppTypography.bodyLarge.copyWith(
+                          color: AppColors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

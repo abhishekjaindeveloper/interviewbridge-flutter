@@ -84,21 +84,46 @@ class AuthRepositoryImpl implements AuthRepository {
       final data = e.response!.data;
       
       String message = AppConstants.errorGeneric;
-      if (data is Map<String, dynamic> && data.containsKey('message')) {
-        final serverMsg = data['message'] as String?;
-        if (serverMsg != null && serverMsg.isNotEmpty) {
-          message = serverMsg;
+      String rejectionReason = '';
+      if (data is Map<String, dynamic>) {
+        if (data.containsKey('message')) {
+          final serverMsg = data['message'] as String?;
+          if (serverMsg != null && serverMsg.isNotEmpty) {
+            message = serverMsg;
+          }
+        }
+        if (data.containsKey('rejectionReason')) {
+          final serverReason = data['rejectionReason'] as String?;
+          if (serverReason != null && serverReason.isNotEmpty) {
+            rejectionReason = serverReason;
+          }
         }
       }
 
       final normalizedMsg = message.toLowerCase();
 
-      if (normalizedMsg.contains('pending admin approval') || normalizedMsg.contains('pending approval')) {
-        return AccountPendingApprovalException(AppConstants.errorPendingApproval);
+      if (normalizedMsg.contains('email or phone number not found') || normalizedMsg.contains('user not found')) {
+        return InvalidCredentialsException(AppConstants.errorUserNotFound);
       }
 
-      if (normalizedMsg.contains('rejected')) {
-        return AccessDeniedException(AppConstants.errorRejected);
+      if (normalizedMsg.contains('incorrect password')) {
+        return InvalidCredentialsException(AppConstants.errorIncorrectPassword);
+      }
+
+      if (normalizedMsg.contains('pending admin approval') || normalizedMsg.contains('pending approval')) {
+        return AccountPendingApprovalException(AppConstants.pendingUserMessage);
+      }
+
+      if (normalizedMsg.contains('rejected') || (data is Map<String, dynamic> && data['rejectionReason'] != null)) {
+        return UserRejectedException(rejectionReason.isNotEmpty ? rejectionReason : AppConstants.notAvailablePlaceholder);
+      }
+
+      if (normalizedMsg.contains('phone number already registered')) {
+        return PhoneAlreadyRegisteredException();
+      }
+
+      if (normalizedMsg.contains('email already exists') || normalizedMsg.contains('email address already registered')) {
+        return EmailAlreadyRegisteredException();
       }
 
       if (normalizedMsg.contains('inactive') || normalizedMsg.contains('disabled')) {

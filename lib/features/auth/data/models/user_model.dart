@@ -4,6 +4,7 @@ class UserModel extends AuthUserEntity {
   const UserModel({
     required super.name,
     required super.email,
+    required super.phoneNumber,
     required super.role,
     required super.approvalStatus,
   });
@@ -12,6 +13,7 @@ class UserModel extends AuthUserEntity {
     return UserModel(
       name: json['name'] as String? ?? '',
       email: json['email'] as String? ?? '',
+      phoneNumber: json['phoneNumber'] as String? ?? '',
       role: json['role'] as String? ?? '',
       approvalStatus: json['approvalStatus'] as String? ?? '',
     );
@@ -21,6 +23,7 @@ class UserModel extends AuthUserEntity {
     return {
       'name': name,
       'email': email,
+      'phoneNumber': phoneNumber,
       'role': role,
       'approvalStatus': approvalStatus,
     };

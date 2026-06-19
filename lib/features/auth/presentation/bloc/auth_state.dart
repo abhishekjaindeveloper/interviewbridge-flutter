@@ -31,3 +31,28 @@ class AuthError extends AuthState {
   @override
   List<Object?> get props => [message];
 }
+
+class AuthRejected extends AuthState {
+  final String rejectionReason;
+
+  const AuthRejected(this.rejectionReason);
+
+  @override
+  List<Object?> get props => [rejectionReason];
+}
+
+class PhoneAlreadyRegistered extends AuthState {
+  final String message;
+  const PhoneAlreadyRegistered(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class EmailAlreadyRegistered extends AuthState {
+  final String message;
+  const EmailAlreadyRegistered(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}

@@ -79,7 +79,7 @@ class _QuestionPageState extends State<QuestionPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           AppConstants.questionPageTitle,
           style: AppTypography.headingMedium,
         ),

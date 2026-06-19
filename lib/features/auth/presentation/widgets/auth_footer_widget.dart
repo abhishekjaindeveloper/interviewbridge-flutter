@@ -22,12 +22,14 @@ class AuthFooterWidget extends StatelessWidget {
         textAlign: TextAlign.center,
         text: TextSpan(
           text: message,
-          style: AppTypography.bodyMedium,
+          style: AppTypography.bodyMedium.copyWith(
+            color: AppColors.textSecondary,
+          ),
           children: [
             TextSpan(
               text: ' $actionText',
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.primaryLight,
+                color: AppColors.primary,
                 fontWeight: FontWeight.bold,
               ),
             ),

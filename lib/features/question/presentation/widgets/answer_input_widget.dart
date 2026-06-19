@@ -45,7 +45,7 @@ class AnswerInputWidget extends StatelessWidget {
             enabled: enabled,
             maxLength: 5000,
             style: AppTypography.bodyMedium.copyWith(color: AppColors.textPrimary),
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               hintText: AppConstants.answerInputPlaceholder,
               hintStyle: TextStyle(color: AppColors.textSecondary),
               border: InputBorder.none,

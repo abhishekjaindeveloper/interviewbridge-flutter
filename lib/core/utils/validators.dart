@@ -1,4 +1,5 @@
 import '../constants/validation_constants.dart';
+import '../constants/app_constants.dart';
 
 class Validators {
   Validators._();
@@ -18,17 +19,27 @@ class Validators {
 
   static String? validateEmailOrPhone(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return ValidationConstants.emailOrPhoneRequired;
+      return AppConstants.emailOrPhoneRequired;
     }
     
     final trimmed = value.trim();
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    final phoneRegex = RegExp(r'^\+?[0-9]{10,15}$');
     
-    if (!emailRegex.hasMatch(trimmed) && !phoneRegex.hasMatch(trimmed)) {
-      return ValidationConstants.invalidEmailOrPhone;
+    // Check if input starts as numeric
+    final isNumericPhone = trimmed.isNotEmpty && RegExp(r'^[0-9]').hasMatch(trimmed[0]);
+    
+    if (isNumericPhone) {
+      final phoneRegex = RegExp(r'^[6-9][0-9]{9}$');
+      if (!phoneRegex.hasMatch(trimmed)) {
+        return AppConstants.invalidPhoneNumberMessage;
+      }
+      return null;
+    } else {
+      final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+      if (!emailRegex.hasMatch(trimmed)) {
+        return AppConstants.invalidEmailOrPhone;
+      }
+      return null;
     }
-    return null;
   }
 
   static String? validatePassword(String? value) {
@@ -43,12 +54,12 @@ class Validators {
 
   static String? validatePhone(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return ValidationConstants.phoneRequired;
+      return AppConstants.phoneNumberRequired;
     }
     final trimmed = value.trim();
-    final phoneRegex = RegExp(r'^[0-9]{10}$');
+    final phoneRegex = RegExp(r'^[6-9][0-9]{9}$');
     if (!phoneRegex.hasMatch(trimmed)) {
-      return ValidationConstants.invalidPhone;
+      return AppConstants.invalidPhoneNumberMessage;
     }
     return null;
   }
