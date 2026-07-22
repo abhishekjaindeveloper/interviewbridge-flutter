@@ -26,6 +26,7 @@ class EvaluationBloc extends Bloc<EvaluationEvent, EvaluationState> {
     on<GetEvaluationRequested>(_onGetEvaluation);
     on<TriggerEvaluationRequested>(_onTriggerEvaluation);
     on<ResetEvaluationState>(_onResetEvaluation);
+    on<ClearEvaluationError>(_onClearEvaluationError);
   }
 
   void _onLoadSessionQuestions(
@@ -149,6 +150,14 @@ class EvaluationBloc extends Bloc<EvaluationEvent, EvaluationState> {
   ) async {
     final currentState = state;
     if (currentState is EvaluationLoaded && !currentState.isEvaluating) {
+      final question = currentState.questions.firstWhere(
+        (q) => q.id == event.questionId,
+        orElse: () => currentState.questions[event.index],
+      );
+      if (question.evaluationStatus?.toUpperCase() == 'COMPLETED') {
+        return;
+      }
+
       emit(currentState.copyWith(
         isEvaluating: true,
         clearEvaluateError: true,
@@ -183,10 +192,14 @@ class EvaluationBloc extends Bloc<EvaluationEvent, EvaluationState> {
 
         // Refresh average score of the session
         double newAverageScore = currentState.averageScore;
+        String? scoreRefreshError;
         try {
           final session = await getPracticeSessionDetailsUseCase(eval.sessionId);
           newAverageScore = session.averageScore;
-        } catch (_) {}
+        } catch (e) {
+          developer.log('Error refreshing average score', error: e);
+          scoreRefreshError = e is AppException ? e.message : 'Failed to refresh average score.';
+        }
 
         final updatedState = state;
         if (updatedState is EvaluationLoaded && updatedState.currentIndex == event.index) {
@@ -195,6 +208,7 @@ class EvaluationBloc extends Bloc<EvaluationEvent, EvaluationState> {
             averageScore: newAverageScore,
             activeEvaluation: eval,
             isEvaluating: false,
+            evaluateError: scoreRefreshError,
           ));
         }
       } on AppException catch (e) {
@@ -223,5 +237,15 @@ class EvaluationBloc extends Bloc<EvaluationEvent, EvaluationState> {
     Emitter<EvaluationState> emit,
   ) {
     emit(EvaluationInitial());
+  }
+
+  void _onClearEvaluationError(
+    ClearEvaluationError event,
+    Emitter<EvaluationState> emit,
+  ) {
+    final currentState = state;
+    if (currentState is EvaluationLoaded) {
+      emit(currentState.copyWith(clearEvaluateError: true));
+    }
   }
 }

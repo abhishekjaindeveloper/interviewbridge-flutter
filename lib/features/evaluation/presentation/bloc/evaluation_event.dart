@@ -43,3 +43,8 @@ class TriggerEvaluationRequested extends EvaluationEvent {
 }
 
 class ResetEvaluationState extends EvaluationEvent {}
+
+class ClearEvaluationError extends EvaluationEvent {
+  const ClearEvaluationError();
+}
+

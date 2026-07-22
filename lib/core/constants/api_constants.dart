@@ -7,7 +7,7 @@ enum AppEnvironment {
 class ApiConstants {
   ApiConstants._();
 
-  static const String _devUrl = 'http://10.11.8.94:9000';
+  static const String _devUrl = 'http://10.65.209.94:9000';
   static const String _stagingUrl = 'https://staging-api.interviewbridge.com';
   static const String _prodUrl = 'https://api.interviewbridge.com';
 
@@ -45,6 +45,7 @@ class ApiConstants {
   // Auth Endpoints
   static const String register = '/api/auth/register';
   static const String login = '/api/auth/login';
+  static const String validateToken = '/api/user/me';
 
   // Admin Endpoints
   static const String adminPendingUsers = '/api/admin/users/pending';

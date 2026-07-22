@@ -157,6 +157,8 @@ class AppConstants {
   static const String goToProfileSetupButton = 'Go to Profile Setup';
   static const String practiceSessionCreatedToast = 'Practice session created successfully!';
   static const String practiceQuestionsGeneratedToast = 'Practice questions generated successfully! Ready for practice.';
+  static const String profileIncompleteDialogTitle = 'Profile Incomplete';
+  static const String completeProfileButtonLabel = 'Complete Profile';
 
   // Session History Strings
   static const String sessionHistoryTitle = 'Session History';
@@ -373,5 +375,55 @@ class AppConstants {
   static const String activateButtonLabel = 'Activate';
   static const String userStatusToggleSuccess = 'User status updated successfully.';
   static const String noUsersFound = 'No users found matching the criteria.';
+
+  // Dynamic UI Formatters and General Constants
+  static const String candidateLabel = 'Candidate';
+  static const String notConfigured = 'Not Configured';
+
+  static String questionOfTotal(int current, int total) {
+    return 'Question $current of $total';
+  }
+
+  static String questionNumber(int number) {
+    return 'Question $number';
+  }
+
+  static const String updatingProfile = 'Updating profile...';
+
+  // Drawer Menu Labels
+  static const String menuDashboardLabel = 'Dashboard';
+  static const String menuProfileLabel = 'Profile';
+  static const String menuSessionHistoryLabel = 'Session History';
+
+  // Dynamic Role Display
+  static String formatRole(String role) {
+    switch (role) {
+      case 'ROLE_USER':
+        return 'User';
+      case 'ROLE_ADMIN':
+        return 'Administrator';
+      case 'ROLE_INTERVIEWER':
+        return 'Interviewer';
+      default:
+        // Safe fallback: strip ROLE_ prefix and title-case
+        final label = role.replaceFirst('ROLE_', '');
+        if (label.isEmpty) return role;
+        return label[0].toUpperCase() + label.substring(1).toLowerCase();
+    }
+  }
+
+  // Centralized Date Formatter (DD MMM YYYY)
+  static const List<String> _monthAbbreviations = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  ];
+
+  static String formatDate(DateTime? dateTime) {
+    if (dateTime == null) return '';
+    final day = dateTime.day.toString().padLeft(2, '0');
+    final month = _monthAbbreviations[dateTime.month - 1];
+    final year = dateTime.year;
+    return '$day $month $year';
+  }
 }
 

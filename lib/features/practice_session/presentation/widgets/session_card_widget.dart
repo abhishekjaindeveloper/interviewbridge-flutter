@@ -18,11 +18,6 @@ class SessionCardWidget extends StatelessWidget {
     this.onTap,
   });
 
-  String _formatDate(DateTime? dateTime) {
-    if (dateTime == null) return '';
-    return '${dateTime.month.toString().padLeft(2, '0')}/${dateTime.day.toString().padLeft(2, '0')}/${dateTime.year}';
-  }
-
   @override
   Widget build(BuildContext context) {
     final isCompleted = session.sessionStatus.toUpperCase() == 'COMPLETED';
@@ -86,7 +81,7 @@ class SessionCardWidget extends StatelessWidget {
                       ),
                       const SizedBox(height: AppSpacing.xs),
                       Text(
-                        _formatDate(session.createdAt),
+                        AppConstants.formatDate(session.createdAt),
                         style: AppTypography.bodyMedium.copyWith(
                           fontWeight: FontWeight.w500,
                         ),

@@ -4,6 +4,7 @@ class RouteNavigator {
   RouteNavigator._();
 
   static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  static final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
 
   static Future<T?> pushNamed<T>(String routeName, {Object? arguments}) {
     return navigatorKey.currentState!.pushNamed<T>(routeName, arguments: arguments);

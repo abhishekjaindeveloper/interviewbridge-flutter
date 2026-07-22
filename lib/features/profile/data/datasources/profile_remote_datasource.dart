@@ -22,17 +22,18 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
 
   @override
   Future<ProfileModel> updateProfile(String name, String technologyId, String experienceId) async {
+    final Map<String, dynamic> body = {'name': name};
+    if (technologyId.isNotEmpty) {
+      body['technologyId'] = technologyId;
+    }
+    if (experienceId.isNotEmpty) {
+      body['experienceId'] = experienceId;
+    }
     final response = await _apiClient.put(
       ApiConstants.userProfile,
-      data: {
-        'technologyId': technologyId,
-        'experienceId': experienceId,
-        'name': name,
-      },
+      data: body,
     );
     final data = response.data['data'] as Map<String, dynamic>;
-    // Override the name field with updated name since backend doesn't save it
-    data['name'] = name;
     return ProfileModel.fromJson(data);
   }
 

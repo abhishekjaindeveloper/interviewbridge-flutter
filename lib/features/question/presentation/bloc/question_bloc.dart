@@ -20,6 +20,7 @@ class QuestionBloc extends Bloc<QuestionEvent, QuestionState> {
     on<NavigateToQuestionRequested>(_onNavigateToQuestion);
     on<SubmitAnswerRequested>(_onSubmitAnswer);
     on<ResetQuestionState>(_onResetQuestionState);
+    on<ClearQuestionError>(_onClearQuestionError);
   }
 
   void _onLoadSessionQuestions(
@@ -161,22 +162,21 @@ class QuestionBloc extends Bloc<QuestionEvent, QuestionState> {
           ));
         }
       } on AppException catch (e) {
-        emit(QuestionError(e.message));
-        // Re-emit previous loaded state to allow user to retry
         emit(QuestionsLoaded(
           questions: questions,
           currentIndex: currentIndex,
           completedQuestions: currentState.completedQuestions,
           totalQuestions: totalQuestions,
+          errorMessage: e.message,
         ));
       } catch (e) {
         developer.log('Error in QuestionBloc', error: e);
-        emit(QuestionError(AppConstants.errorGeneric));
         emit(QuestionsLoaded(
           questions: questions,
           currentIndex: currentIndex,
           completedQuestions: currentState.completedQuestions,
           totalQuestions: totalQuestions,
+          errorMessage: AppConstants.errorGeneric,
         ));
       }
     }
@@ -187,5 +187,15 @@ class QuestionBloc extends Bloc<QuestionEvent, QuestionState> {
     Emitter<QuestionState> emit,
   ) {
     emit(QuestionInitial());
+  }
+
+  void _onClearQuestionError(
+    ClearQuestionError event,
+    Emitter<QuestionState> emit,
+  ) {
+    final currentState = state;
+    if (currentState is QuestionsLoaded) {
+      emit(currentState.copyWith(clearErrorMessage: true));
+    }
   }
 }

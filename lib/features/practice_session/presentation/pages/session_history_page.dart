@@ -12,6 +12,7 @@ import '../bloc/practice_session_event.dart';
 import '../bloc/practice_session_state.dart';
 import '../widgets/session_card_widget.dart';
 import '../../../../core/routes/route_constants.dart';
+import '../../../../core/routes/route_navigator.dart';
 
 class SessionHistoryPage extends StatefulWidget {
   const SessionHistoryPage({super.key});
@@ -20,10 +21,30 @@ class SessionHistoryPage extends StatefulWidget {
   State<SessionHistoryPage> createState() => _SessionHistoryPageState();
 }
 
-class _SessionHistoryPageState extends State<SessionHistoryPage> {
+class _SessionHistoryPageState extends State<SessionHistoryPage> with RouteAware {
   @override
   void initState() {
     super.initState();
+    context.read<PracticeSessionBloc>().add(LoadSessionHistoryRequested());
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route != null) {
+      RouteNavigator.routeObserver.subscribe(this, route);
+    }
+  }
+
+  @override
+  void dispose() {
+    RouteNavigator.routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
     context.read<PracticeSessionBloc>().add(LoadSessionHistoryRequested());
   }
 

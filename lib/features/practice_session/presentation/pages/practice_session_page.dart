@@ -1,6 +1,5 @@
 // ignore_for_file: deprecated_member_use
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -12,6 +11,8 @@ import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/user_drawer.dart';
 import '../../../profile/presentation/bloc/profile_bloc.dart';
 import '../../../profile/presentation/bloc/profile_state.dart';
+import '../../../auth/presentation/bloc/auth_bloc.dart';
+import '../../../auth/presentation/bloc/auth_state.dart';
 import '../bloc/practice_session_bloc.dart';
 import '../bloc/practice_session_event.dart';
 import '../bloc/practice_session_state.dart';
@@ -33,6 +34,168 @@ class _PracticeSessionPageState extends State<PracticeSessionPage> {
   void initState() {
     super.initState();
     context.read<PracticeSessionBloc>().add(LoadSessionHistoryRequested());
+  }
+
+  void _showProfileSetupRequiredDialog(BuildContext context) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: '',
+      barrierColor: AppColors.black.withValues(alpha: 0.5),
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (dialogContext, anim1, anim2) {
+        return Dialog(
+          backgroundColor: AppColors.surface,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            side: BorderSide(color: AppColors.border),
+            borderRadius: BorderRadius.circular(AppDimensions.cardRadius),
+          ),
+          child: Container(
+            constraints: const BoxConstraints(
+              maxWidth: AppDimensions.maxContentWidth - 100,
+            ),
+            padding: const EdgeInsets.all(AppSpacing.xl),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  decoration: BoxDecoration(
+                    color: AppColors.warning.withValues(alpha: AppDimensions.opacityLow),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.warning_amber_outlined,
+                    color: AppColors.warning,
+                    size: AppDimensions.iconMedium,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                Text(
+                  'Profile Setup Required',
+                  style: AppTypography.headingSmall.copyWith(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  'Please complete your Technology and Experience before starting a practice session.',
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.xl),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.of(dialogContext).pop(),
+                        child: Text(
+                          AppConstants.cancelButtonLabel,
+                          style: AppTypography.bodyLarge.copyWith(
+                            color: AppColors.textSecondary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(AppDimensions.inputRadius),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.of(dialogContext).pop();
+                          Navigator.of(context).pushNamed(RouteConstants.profileSetup);
+                        },
+                        child: const Text(
+                          'Complete Profile',
+                          style: TextStyle(
+                            color: AppColors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, anim1, anim2, child) {
+        final curve = CurvedAnimation(parent: anim1, curve: Curves.easeOutBack);
+        return ScaleTransition(
+          scale: curve,
+          child: FadeTransition(
+            opacity: anim1,
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildProfileHeaderWidget(BuildContext context, String userName, String userRole) {
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).pushNamed(RouteConstants.profile);
+      },
+      borderRadius: BorderRadius.circular(AppDimensions.inputRadius),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  userName,
+                  style: AppTypography.bodyLarge.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                    fontSize: 14,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  userRole,
+                  style: AppTypography.bodyMedium.copyWith(
+                    fontSize: 11,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            CircleAvatar(
+              radius: 18,
+              backgroundColor: AppColors.primary,
+              child: Text(
+                userName.isNotEmpty ? userName[0].toUpperCase() : 'U',
+                style: const TextStyle(
+                  color: AppColors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _onStartSessionPressed(String techId, String expId) {
@@ -103,113 +266,6 @@ class _PracticeSessionPageState extends State<PracticeSessionPage> {
     );
   }
 
-  Future<bool?> _showExitConfirmationDialog(BuildContext context) {
-    return showGeneralDialog<bool>(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: '',
-      barrierColor: AppColors.black.withValues(alpha: 0.5),
-      transitionDuration: const Duration(milliseconds: 300),
-      pageBuilder: (dialogContext, anim1, anim2) {
-        return Dialog(
-          backgroundColor: AppColors.surface,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            side: BorderSide(color: AppColors.border),
-            borderRadius: BorderRadius.circular(AppDimensions.cardRadius),
-          ),
-          child: Container(
-            constraints: const BoxConstraints(
-              maxWidth: AppDimensions.maxContentWidth - 100,
-            ),
-            padding: const EdgeInsets.all(AppSpacing.xl),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: AppDimensions.opacityLow),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.exit_to_app_rounded,
-                    color: AppColors.primary,
-                    size: AppDimensions.iconMedium,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                Text(
-                  AppConstants.exitTitle,
-                  style: AppTypography.headingSmall.copyWith(
-                    color: AppColors.textPrimary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                Text(
-                  AppConstants.exitMessage,
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: AppSpacing.xl),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () => Navigator.of(dialogContext).pop(false),
-                        child: Text(
-                          AppConstants.cancelButtonLabel,
-                          style: AppTypography.bodyLarge.copyWith(
-                            color: AppColors.textSecondary,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.md),
-                    Expanded(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppDimensions.inputRadius),
-                          ),
-                        ),
-                        onPressed: () {
-                          Navigator.of(dialogContext).pop(true);
-                        },
-                        child: Text(
-                          AppConstants.exitButtonLabel,
-                          style: AppTypography.bodyLarge.copyWith(
-                            color: AppColors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-      transitionBuilder: (context, anim1, anim2, child) {
-        final curve = CurvedAnimation(parent: anim1, curve: Curves.easeOutBack);
-        return ScaleTransition(
-          scale: curve,
-          child: FadeTransition(
-            opacity: anim1,
-            child: child,
-          ),
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -229,28 +285,35 @@ class _PracticeSessionPageState extends State<PracticeSessionPage> {
         expId = profileState.profile.experience!.id;
       }
     }
+    final authState = context.watch<AuthBloc>().state;
+    String userName = 'User';
+    String userRole = AppConstants.candidateLabel;
+    if (authState is Authenticated) {
+      userName = authState.user.name;
+      userRole = AppConstants.formatRole(authState.user.role);
+    }
 
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) return;
-        final shouldExit = await _showExitConfirmationDialog(context);
-        if (shouldExit == true) {
-          SystemNavigator.pop();
-        }
-      },
-      child: Scaffold(
-        backgroundColor: AppColors.background,
-        appBar: AppBar(
-          title: Text(
-            AppConstants.practiceDashboardTitle,
-            style: AppTypography.headingMedium,
-          ),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
+    if (techName.isEmpty) techName = AppConstants.notConfigured;
+    if (expLabel.isEmpty) expLabel = AppConstants.notConfigured;
+
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        title: Text(
+          AppConstants.practiceDashboardTitle,
+          style: AppTypography.headingMedium,
         ),
-        drawer: const UserDrawer(currentRoute: RouteConstants.sessionStart),
-        body: BlocConsumer<PracticeSessionBloc, PracticeSessionState>(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          _buildProfileHeaderWidget(context, userName, userRole),
+        ],
+      ),
+      drawer: UserDrawer(
+        currentRoute: RouteConstants.sessionStart,
+        parentContext: context,
+      ),
+      body: BlocConsumer<PracticeSessionBloc, PracticeSessionState>(
           listener: (context, state) {
             if (state is PracticeSessionCreated) {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -426,7 +489,15 @@ class _PracticeSessionPageState extends State<PracticeSessionPage> {
                               const SizedBox(height: AppSpacing.xl),
                               CustomButton(
                                 text: AppConstants.startPracticeButton,
-                                onPressed: isLoading ? null : () => _onStartSessionPressed(techId, expId),
+                                onPressed: isLoading
+                                    ? null
+                                    : () {
+                                        if (!isProfileComplete) {
+                                          _showProfileSetupRequiredDialog(context);
+                                        } else {
+                                          _onStartSessionPressed(techId, expId);
+                                        }
+                                      },
                                 isLoading: isLoading,
                               ),
                             ],
@@ -500,7 +571,6 @@ class _PracticeSessionPageState extends State<PracticeSessionPage> {
             );
           },
         ),
-      ),
-    );
+      );
   }
 }

@@ -9,6 +9,7 @@ import '../../../../core/constants/app_constants.dart';
 import '../../../../core/routes/route_constants.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/loading_indicator.dart';
+import '../../../../core/widgets/error_dialog.dart';
 import '../bloc/question_bloc.dart';
 import '../bloc/question_event.dart';
 import '../bloc/question_state.dart';
@@ -89,6 +90,18 @@ class _QuestionPageState extends State<QuestionPage> {
       body: BlocConsumer<QuestionBloc, QuestionState>(
         listener: (context, state) {
           if (state is QuestionsLoaded) {
+            if (state.errorMessage != null) {
+              ErrorDialog.show(
+                context: context,
+                title: 'Error',
+                message: state.errorMessage!,
+              ).then((_) {
+                if (context.mounted) {
+                  context.read<QuestionBloc>().add(const ClearQuestionError());
+                }
+              });
+            }
+
             if (state.currentIndex != _lastIndex) {
               // 1. Save draft for the old index (if valid and not answered)
               if (_lastIndex >= 0 && _lastIndex < state.questions.length) {
@@ -115,24 +128,16 @@ class _QuestionPageState extends State<QuestionPage> {
             // Clear draft on successful submission
             _draftAnswers.remove(state.currentIndex);
 
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  AppConstants.answerSubmittedToast,
-                  style: AppTypography.bodyMedium.copyWith(color: AppColors.white),
-                ),
-                backgroundColor: AppColors.success,
-              ),
+            SuccessDialog.show(
+              context: context,
+              title: 'Success',
+              message: AppConstants.answerSubmittedToast,
             );
           } else if (state is QuestionError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  state.message,
-                  style: AppTypography.bodyMedium.copyWith(color: AppColors.white),
-                ),
-                backgroundColor: AppColors.error,
-              ),
+            ErrorDialog.show(
+              context: context,
+              title: 'Error',
+              message: state.message,
             );
           }
         },
@@ -257,7 +262,7 @@ class _QuestionPageState extends State<QuestionPage> {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    'Question ${currentIndex + 1} of $total',
+                                    AppConstants.questionOfTotal(currentIndex + 1, total),
                                     style: AppTypography.bodyMedium.copyWith(
                                       fontWeight: FontWeight.bold,
                                       color: AppColors.textSecondary,

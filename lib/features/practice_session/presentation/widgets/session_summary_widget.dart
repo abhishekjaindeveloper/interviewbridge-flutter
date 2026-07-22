@@ -16,11 +16,6 @@ class SessionSummaryWidget extends StatelessWidget {
     required this.session,
   });
 
-  String _formatDate(DateTime? dateTime) {
-    if (dateTime == null) return '';
-    return '${dateTime.month.toString().padLeft(2, '0')}/${dateTime.day.toString().padLeft(2, '0')}/${dateTime.year}';
-  }
-
   Widget _buildRow(String label, String value, {Widget? customValue}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
@@ -81,7 +76,7 @@ class SessionSummaryWidget extends StatelessWidget {
           _buildRow(AppConstants.totalQuestionsLabel, '${session.totalQuestions}'),
           _buildRow(AppConstants.completedQuestionsLabelDetailed, '${session.completedQuestions}'),
           _buildRow(AppConstants.averageScoreLabel, '${session.averageScore.toStringAsFixed(1)}/10.0'),
-          _buildRow(AppConstants.createdAtLabel, _formatDate(session.createdAt)),
+          _buildRow(AppConstants.createdAtLabel, AppConstants.formatDate(session.createdAt)),
         ],
       ),
     );

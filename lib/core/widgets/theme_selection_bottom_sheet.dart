@@ -8,6 +8,9 @@ import '../theme/app_dimensions.dart';
 import '../constants/app_constants.dart';
 
 void showThemeSelectionBottomSheet(BuildContext context) {
+  final themeCubit = context.read<ThemeCubit>();
+  final currentMode = themeCubit.state;
+
   showModalBottomSheet(
     context: context,
     backgroundColor: AppColors.surface,
@@ -18,55 +21,53 @@ void showThemeSelectionBottomSheet(BuildContext context) {
       ),
     ),
     builder: (sheetContext) {
-      return BlocBuilder<ThemeCubit, ThemeMode>(
-        bloc: context.read<ThemeCubit>(),
-        builder: (context, currentMode) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.lg,
-              vertical: AppSpacing.xl,
+      return Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.xl,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              AppConstants.selectThemeTitle,
+              style: AppTypography.headingSmall.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+              textAlign: TextAlign.center,
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  AppConstants.selectThemeTitle,
-                  style: AppTypography.headingSmall.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                _buildThemeOption(
-                  context,
-                  title: AppConstants.lightThemeLabel,
-                  icon: Icons.light_mode_outlined,
-                  mode: ThemeMode.light,
-                  isSelected: currentMode == ThemeMode.light,
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                _buildThemeOption(
-                  context,
-                  title: AppConstants.darkThemeLabel,
-                  icon: Icons.dark_mode_outlined,
-                  mode: ThemeMode.dark,
-                  isSelected: currentMode == ThemeMode.dark,
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                _buildThemeOption(
-                  context,
-                  title: AppConstants.systemThemeLabel,
-                  icon: Icons.settings_brightness_outlined,
-                  mode: ThemeMode.system,
-                  isSelected: currentMode == ThemeMode.system,
-                ),
-                const SizedBox(height: AppSpacing.xl),
-              ],
+            const SizedBox(height: AppSpacing.lg),
+            _buildThemeOption(
+              sheetContext,
+              themeCubit: themeCubit,
+              title: AppConstants.lightThemeLabel,
+              icon: Icons.light_mode_outlined,
+              mode: ThemeMode.light,
+              isSelected: currentMode == ThemeMode.light,
             ),
-          );
-        },
+            const SizedBox(height: AppSpacing.sm),
+            _buildThemeOption(
+              sheetContext,
+              themeCubit: themeCubit,
+              title: AppConstants.darkThemeLabel,
+              icon: Icons.dark_mode_outlined,
+              mode: ThemeMode.dark,
+              isSelected: currentMode == ThemeMode.dark,
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            _buildThemeOption(
+              sheetContext,
+              themeCubit: themeCubit,
+              title: AppConstants.systemThemeLabel,
+              icon: Icons.settings_brightness_outlined,
+              mode: ThemeMode.system,
+              isSelected: currentMode == ThemeMode.system,
+            ),
+            const SizedBox(height: AppSpacing.xl),
+          ],
+        ),
       );
     },
   );
@@ -74,6 +75,7 @@ void showThemeSelectionBottomSheet(BuildContext context) {
 
 Widget _buildThemeOption(
   BuildContext context, {
+  required ThemeCubit themeCubit,
   required String title,
   required IconData icon,
   required ThemeMode mode,
@@ -81,8 +83,8 @@ Widget _buildThemeOption(
 }) {
   return InkWell(
     onTap: () {
-      context.read<ThemeCubit>().setTheme(mode);
       Navigator.of(context).pop();
+      Future.microtask(() => themeCubit.setTheme(mode));
     },
     borderRadius: BorderRadius.circular(AppDimensions.inputRadius),
     child: Container(

@@ -6,6 +6,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/loading_indicator.dart';
+import '../../../../core/widgets/error_dialog.dart';
 import '../../../technology/presentation/bloc/technology_bloc.dart';
 import '../../../technology/presentation/bloc/technology_event.dart';
 import '../../../technology/presentation/bloc/technology_state.dart';
@@ -44,14 +45,10 @@ class _TechnologyExperienceSelectionPageState extends State<TechnologyExperience
 
   void _onSubmitPressed() {
     if (_selectedTechnologyId == null || _selectedExperienceId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppConstants.selectionValidationWarning,
-            style: AppTypography.bodyMedium.copyWith(color: AppColors.white),
-          ),
-          backgroundColor: AppColors.warning,
-        ),
+      WarningDialog.show(
+        context: context,
+        title: 'Warning',
+        message: 'Select both Technology and Experience before continuing.',
       );
       return;
     }
@@ -79,25 +76,17 @@ class _TechnologyExperienceSelectionPageState extends State<TechnologyExperience
       body: BlocListener<ProfileBloc, ProfileState>(
         listener: (context, state) {
           if (state is ProfileSetupSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  AppConstants.selectionSuccess,
-                  style: AppTypography.bodyMedium.copyWith(color: AppColors.white),
-                ),
-                backgroundColor: AppColors.success,
-              ),
+            SuccessDialog.show(
+              context: context,
+              title: 'Success',
+              message: AppConstants.selectionSuccess,
             );
             Navigator.of(context).pop();
           } else if (state is ProfileError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  state.message,
-                  style: AppTypography.bodyMedium.copyWith(color: AppColors.white),
-                ),
-                backgroundColor: AppColors.error,
-              ),
+            ErrorDialog.show(
+              context: context,
+              title: 'Error',
+              message: state.message,
             );
           }
         },

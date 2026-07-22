@@ -33,14 +33,6 @@ class _PendingUsersWidgetState extends State<PendingUsersWidget> {
     context.read<AdminBloc>().add(LoadPendingUsers());
   }
 
-  String _formatDate(DateTime? dateTime) {
-    if (dateTime == null) return AppConstants.notAvailablePlaceholder;
-    final year = dateTime.year;
-    final month = dateTime.month.toString().padLeft(2, '0');
-    final day = dateTime.day.toString().padLeft(2, '0');
-    return '$year-$month-$day';
-  }
-
   void _confirmAction(BuildContext context, AdminEntity user, bool isApproval) {
     final adminBloc = context.read<AdminBloc>();
     if (!isApproval) {
@@ -426,7 +418,7 @@ class _PendingUsersWidgetState extends State<PendingUsersWidget> {
                 const SizedBox(height: AppSpacing.xs),
                 _buildCardField(Icons.phone_outlined, AppConstants.phoneNumberLabel, user.phoneNumber ?? 'N/A'),
                 const SizedBox(height: AppSpacing.xs),
-                _buildCardField(Icons.calendar_today_outlined, AppConstants.adminRegistrationDateLabel, _formatDate(user.createdAt)),
+                _buildCardField(Icons.calendar_today_outlined, AppConstants.adminRegistrationDateLabel, AppConstants.formatDate(user.createdAt)),
                 const SizedBox(height: AppSpacing.md),
                 Row(
                   children: [
@@ -525,7 +517,7 @@ class _PendingUsersWidgetState extends State<PendingUsersWidget> {
                     DataCell(Text(user.name, style: TextStyle(color: AppColors.textPrimary))),
                     DataCell(Text(user.email, style: TextStyle(color: AppColors.textPrimary))),
                     DataCell(Text(user.phoneNumber ?? 'N/A', style: TextStyle(color: AppColors.textSecondary))),
-                    DataCell(Text(_formatDate(user.createdAt), style: TextStyle(color: AppColors.textSecondary))),
+                    DataCell(Text(AppConstants.formatDate(user.createdAt), style: TextStyle(color: AppColors.textSecondary))),
                     DataCell(
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),

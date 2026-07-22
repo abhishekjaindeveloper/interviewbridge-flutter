@@ -4,6 +4,7 @@ import '../models/login_request_model.dart';
 import '../models/register_request_model.dart';
 import '../models/login_response_model.dart';
 import '../models/register_response_model.dart';
+import '../models/user_model.dart';
 
 abstract class AuthRemoteDataSource {
   Future<LoginResponseModel> login(String email, String password);
@@ -14,6 +15,7 @@ abstract class AuthRemoteDataSource {
     String password,
     bool termsAccepted,
   );
+  Future<UserModel> validateToken();
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -51,5 +53,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     );
     final data = response.data['data'] as Map<String, dynamic>;
     return RegisterResponseModel.fromJson(data);
+  }
+
+  @override
+  Future<UserModel> validateToken() async {
+    final response = await _apiClient.get(ApiConstants.validateToken);
+    final data = response.data['data'] as Map<String, dynamic>;
+    return UserModel.fromJson(data);
   }
 }

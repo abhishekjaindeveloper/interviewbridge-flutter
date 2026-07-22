@@ -9,6 +9,7 @@ import '../../../../core/constants/app_constants.dart';
 import '../../../../core/routes/route_constants.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/loading_indicator.dart';
+import '../../../../core/widgets/error_dialog.dart';
 import '../bloc/evaluation_bloc.dart';
 import '../bloc/evaluation_event.dart';
 import '../bloc/evaluation_state.dart';
@@ -32,12 +33,6 @@ class _EvaluationPageState extends State<EvaluationPage> {
   void initState() {
     super.initState();
     context.read<EvaluationBloc>().add(LoadSessionQuestionsRequested(widget.sessionId));
-  }
-
-  @override
-  void dispose() {
-    context.read<EvaluationBloc>().add(ResetEvaluationState());
-    super.dispose();
   }
 
   @override
@@ -65,15 +60,15 @@ class _EvaluationPageState extends State<EvaluationPage> {
       body: BlocConsumer<EvaluationBloc, EvaluationState>(
         listener: (context, state) {
           if (state is EvaluationLoaded && state.evaluateError != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  state.evaluateError!,
-                  style: AppTypography.bodyMedium.copyWith(color: AppColors.white),
-                ),
-                backgroundColor: AppColors.error,
-              ),
-            );
+            ErrorDialog.show(
+              context: context,
+              title: 'Evaluation Error',
+              message: state.evaluateError!,
+            ).then((_) {
+              if (context.mounted) {
+                context.read<EvaluationBloc>().add(const ClearEvaluationError());
+              }
+            });
           }
         },
         builder: (context, state) {
@@ -279,7 +274,7 @@ class _EvaluationPageState extends State<EvaluationPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Question ${q.questionNumber}',
+                              AppConstants.questionNumber(q.questionNumber),
                               style: AppTypography.bodyMedium.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textPrimary,
@@ -421,7 +416,7 @@ class _EvaluationPageState extends State<EvaluationPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Question ${activeQuestion.questionNumber} of ${state.questions.length}',
+                    AppConstants.questionOfTotal(activeQuestion.questionNumber, state.questions.length),
                     style: AppTypography.bodyMedium.copyWith(
                       fontWeight: FontWeight.bold,
                       color: AppColors.textSecondary,

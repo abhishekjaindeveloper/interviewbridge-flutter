@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'dart:convert';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/exceptions/app_exceptions.dart';
 import '../../domain/entities/user_entity.dart';
@@ -58,16 +59,61 @@ class AuthRepositoryImpl implements AuthRepository {
     await _localDataSource.clearUser();
   }
 
+  bool _isJwtExpired(String token) {
+    try {
+      final parts = token.split('.');
+      if (parts.length != 3) {
+        return true;
+      }
+      String payload = parts[1];
+      int padding = 4 - (payload.length % 4);
+      if (padding != 4) {
+        payload += '=' * padding;
+      }
+      payload = payload.replaceAll('-', '+').replaceAll('_', '/');
+      final decodedString = utf8.decode(base64Decode(payload));
+      final decodedMap = jsonDecode(decodedString);
+      if (decodedMap is Map<String, dynamic> && decodedMap.containsKey('exp')) {
+        final exp = decodedMap['exp'] as int;
+        final expDate = DateTime.fromMillisecondsSinceEpoch(exp * 1000);
+        return DateTime.now().isAfter(expDate);
+      }
+      return true;
+    } catch (_) {
+      return true;
+    }
+  }
+
   @override
   Future<AuthUserEntity?> getLoggedInUser() async {
     try {
       final token = await _localDataSource.getToken();
-      if (token == null || token.isEmpty) {
+      if (token == null || token.isEmpty || _isJwtExpired(token)) {
+        await logout();
         return null;
       }
-      return await _localDataSource.getUser();
+      final user = await _localDataSource.getUser();
+      if (user == null) {
+        await logout();
+        return null;
+      }
+      return user;
     } catch (_) {
+      try {
+        await logout();
+      } catch (_) {}
       return null;
+    }
+  }
+
+  @override
+  Future<AuthUserEntity> validateToken() async {
+    try {
+      final model = await _remoteDataSource.validateToken();
+      await _localDataSource.saveUser(model);
+      return model;
+    } on DioException catch (e) {
+      throw _mapDioException(e);
     }
   }
 

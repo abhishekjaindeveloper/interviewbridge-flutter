@@ -87,6 +87,7 @@ class _AppState extends State<App> with WidgetsBindingObserver {
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             navigatorKey: RouteNavigator.navigatorKey,
+            navigatorObservers: [RouteNavigator.routeObserver],
             onGenerateRoute: AppRouter.onGenerateRoute,
             initialRoute: RouteConstants.initial,
           );

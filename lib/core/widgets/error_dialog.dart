@@ -18,6 +18,7 @@ class ErrorDialog extends StatelessWidget {
   final String title;
   final String message;
   final DialogType type;
+  final String? confirmButtonText;
   final VoidCallback? onConfirm;
 
   static bool _isShowing = false;
@@ -27,6 +28,7 @@ class ErrorDialog extends StatelessWidget {
     required this.title,
     required this.message,
     this.type = DialogType.error,
+    this.confirmButtonText,
     this.onConfirm,
   });
 
@@ -35,6 +37,7 @@ class ErrorDialog extends StatelessWidget {
     required String title,
     required String message,
     DialogType type = DialogType.error,
+    String? confirmButtonText,
     VoidCallback? onConfirm,
   }) {
     if (_isShowing) return Future.value();
@@ -51,6 +54,7 @@ class ErrorDialog extends StatelessWidget {
           title: title,
           message: message,
           type: type,
+          confirmButtonText: confirmButtonText,
           onConfirm: onConfirm,
         );
       },
@@ -146,7 +150,7 @@ class ErrorDialog extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.xl),
             CustomButton(
-              text: AppConstants.okButton,
+              text: confirmButtonText ?? AppConstants.okButton,
               onPressed: () {
                 Navigator.of(context).pop();
                 onConfirm?.call();
@@ -155,6 +159,40 @@ class ErrorDialog extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class SuccessDialog {
+  static Future<void> show({
+    required BuildContext context,
+    required String title,
+    required String message,
+    VoidCallback? onConfirm,
+  }) {
+    return ErrorDialog.show(
+      context: context,
+      title: title,
+      message: message,
+      type: DialogType.success,
+      onConfirm: onConfirm,
+    );
+  }
+}
+
+class WarningDialog {
+  static Future<void> show({
+    required BuildContext context,
+    required String title,
+    required String message,
+    VoidCallback? onConfirm,
+  }) {
+    return ErrorDialog.show(
+      context: context,
+      title: title,
+      message: message,
+      type: DialogType.warning,
+      onConfirm: onConfirm,
     );
   }
 }

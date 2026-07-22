@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/routes/route_constants.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
 import 'login_page.dart';
 import 'pending_approval_page.dart';
 import '../../../admin/presentation/pages/admin_dashboard_page.dart';
-import '../../../practice_session/presentation/pages/practice_session_page.dart';
+import '../../../practice_session/presentation/pages/user_dashboard_page.dart';
 import '../../../practice_session/presentation/bloc/practice_session_bloc.dart';
 import '../../../practice_session/presentation/bloc/practice_session_event.dart';
 import '../../../question/presentation/bloc/question_bloc.dart';
@@ -36,7 +37,10 @@ class _AuthWrapperState extends State<AuthWrapper> {
   @override
   void initState() {
     super.initState();
-    context.read<AuthBloc>().add(AuthStarted());
+    final authBloc = context.read<AuthBloc>();
+    if (authBloc.state is AuthInitial) {
+      authBloc.add(AuthStarted());
+    }
   }
 
   @override
@@ -47,7 +51,8 @@ class _AuthWrapperState extends State<AuthWrapper> {
             state is Authenticated ||
             state is AuthError ||
             state is AuthRejected ||
-            state is PhoneAlreadyRegistered) {
+            state is PhoneAlreadyRegistered ||
+            state is EmailAlreadyRegistered) {
           if (!_hasInitialCheckCompleted) {
             setState(() {
               _hasInitialCheckCompleted = true;
@@ -62,6 +67,15 @@ class _AuthWrapperState extends State<AuthWrapper> {
           context.read<ProfileBloc>().add(ResetProfileState());
           context.read<TechnologyBloc>().add(ResetTechnologyState());
           context.read<ExperienceBloc>().add(ResetExperienceState());
+          
+          Future.microtask(() {
+            if (context.mounted) {
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                RouteConstants.landing,
+                (route) => false,
+              );
+            }
+          });
         } else if (state is AuthError) {
           final msg = state.message;
           final isInlineError = msg == AppConstants.errorUserNotFound ||
@@ -109,7 +123,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
           if (state.user.role == 'ROLE_ADMIN') {
             return const AdminDashboardPage();
           }
-          return const PracticeSessionPage();
+          return const UserDashboardPage();
         } else {
           return const LoginPage();
         }

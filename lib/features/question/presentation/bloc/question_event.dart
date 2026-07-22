@@ -39,3 +39,7 @@ class NavigateToQuestionRequested extends QuestionEvent {
 }
 
 class ResetQuestionState extends QuestionEvent {}
+
+class ClearQuestionError extends QuestionEvent {
+  const ClearQuestionError();
+}

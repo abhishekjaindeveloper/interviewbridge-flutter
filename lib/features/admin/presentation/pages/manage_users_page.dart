@@ -206,15 +206,6 @@ class _ManageUsersPageState extends State<ManageUsersPage> {
     );
   }
 
-  String _formatDate(DateTime? dateTime) {
-    if (dateTime == null) return AppConstants.notAvailablePlaceholder;
-    final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ];
-    return '${dateTime.day} ${months[dateTime.month - 1]}, ${dateTime.year}';
-  }
-
   @override
   Widget build(BuildContext context) {
     return BlocListener<AdminBloc, AdminState>(
@@ -386,7 +377,7 @@ class _ManageUsersPageState extends State<ManageUsersPage> {
                     activeThumbColor: AppColors.success,
                   ),
                 ),
-                DataCell(Text(_formatDate(user.createdAt))),
+                DataCell(Text(AppConstants.formatDate(user.createdAt))),
               ],
             );
           }).toList(),
@@ -465,7 +456,7 @@ class _ManageUsersPageState extends State<ManageUsersPage> {
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
-                  'Registered: ${_formatDate(user.createdAt)}',
+                  'Registered: ${AppConstants.formatDate(user.createdAt)}',
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.textSecondary,
                     fontSize: 12,

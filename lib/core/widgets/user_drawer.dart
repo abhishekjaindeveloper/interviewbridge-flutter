@@ -13,13 +13,15 @@ import '../../features/auth/presentation/bloc/auth_event.dart';
 
 class UserDrawer extends StatelessWidget {
   final String currentRoute;
+  final BuildContext parentContext;
 
   const UserDrawer({
     super.key,
     required this.currentRoute,
+    required this.parentContext,
   });
 
-  void _showLogoutConfirmationDialog(BuildContext context) {
+  void _showLogoutConfirmationDialog(BuildContext context, AuthBloc authBloc) {
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
@@ -97,7 +99,7 @@ class UserDrawer extends StatelessWidget {
                         ),
                         onPressed: () {
                           Navigator.of(dialogContext).pop();
-                          context.read<AuthBloc>().add(LogoutRequested());
+                          authBloc.add(LogoutRequested());
                         },
                         child: Text(
                           AppConstants.logoutButtonLabel,
@@ -132,8 +134,10 @@ class UserDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final authState = context.watch<AuthBloc>().state;
     String userName = 'User';
+    String userRole = AppConstants.candidateLabel;
     if (authState is Authenticated) {
       userName = authState.user.name;
+      userRole = AppConstants.formatRole(authState.user.role);
     }
 
     return Drawer(
@@ -150,7 +154,7 @@ class UserDrawer extends StatelessWidget {
               ),
             ),
             accountEmail: Text(
-              'Candidate',
+              userRole,
               style: AppTypography.bodyMedium.copyWith(
                 color: AppColors.textSecondary,
                 fontWeight: FontWeight.bold,
@@ -169,71 +173,95 @@ class UserDrawer extends StatelessWidget {
               ),
               child: CircleAvatar(
                 backgroundColor: AppColors.surface,
-                backgroundImage: AssetImage('assets/icon/app_icon.png'),
+                backgroundImage: const AssetImage('assets/icon/app_icon.png'),
+                onBackgroundImageError: (exception, stackTrace) {},
+                child: Text(
+                  userName.isNotEmpty ? userName[0].toUpperCase() : 'U',
+                  style: AppTypography.headingMedium.copyWith(
+                    color: AppColors.primary,
+                  ),
+                ),
               ),
             ),
           ),
           ListTile(
             leading: Icon(
-              (currentRoute == RouteConstants.home || currentRoute == RouteConstants.sessionStart)
+              currentRoute == RouteConstants.home
                   ? Icons.dashboard
                   : Icons.dashboard_outlined,
-              color: (currentRoute == RouteConstants.home || currentRoute == RouteConstants.sessionStart)
+              color: currentRoute == RouteConstants.home
                   ? AppColors.primary
                   : AppColors.textSecondary,
             ),
             title: Text(
-              'Dashboard',
+              AppConstants.menuDashboardLabel,
               style: AppTypography.bodyLarge.copyWith(
-                color: (currentRoute == RouteConstants.home || currentRoute == RouteConstants.sessionStart)
+                color: currentRoute == RouteConstants.home
                     ? AppColors.primary
                     : AppColors.textPrimary,
-                fontWeight: (currentRoute == RouteConstants.home || currentRoute == RouteConstants.sessionStart)
+                fontWeight: currentRoute == RouteConstants.home
                     ? FontWeight.bold
                     : FontWeight.normal,
               ),
             ),
             onTap: () {
               Navigator.of(context).pop();
-              if (currentRoute != RouteConstants.home && currentRoute != RouteConstants.sessionStart) {
+              if (currentRoute != RouteConstants.home) {
                 Navigator.of(context).popUntil((route) => route.isFirst);
               }
             },
           ),
           ListTile(
             leading: Icon(
-              currentRoute == RouteConstants.profile
-                  ? Icons.person
-                  : Icons.person_outline,
-              color: currentRoute == RouteConstants.profile
+              currentRoute == RouteConstants.sessionStart
+                  ? Icons.forum
+                  : Icons.forum_outlined,
+              color: currentRoute == RouteConstants.sessionStart
                   ? AppColors.primary
                   : AppColors.textSecondary,
             ),
             title: Text(
-              'Profile',
+              'Practice Session',
               style: AppTypography.bodyLarge.copyWith(
-                color: currentRoute == RouteConstants.profile
+                color: currentRoute == RouteConstants.sessionStart
                     ? AppColors.primary
                     : AppColors.textPrimary,
-                fontWeight: currentRoute == RouteConstants.profile
+                fontWeight: currentRoute == RouteConstants.sessionStart
                     ? FontWeight.bold
                     : FontWeight.normal,
               ),
             ),
             onTap: () {
               Navigator.of(context).pop();
-              if (currentRoute != RouteConstants.profile) {
-                bool hasProfile = false;
-                Navigator.of(context).popUntil((route) {
-                  if (route.settings.name == RouteConstants.profile) {
-                    hasProfile = true;
-                    return true;
-                  }
-                  return false;
-                });
-                if (!hasProfile) {
-                  Navigator.of(context).pushNamed(RouteConstants.profile);
-                }
+              if (currentRoute != RouteConstants.sessionStart) {
+                Navigator.of(context).popUntil((route) => route.isFirst);
+                Navigator.of(context).pushNamed(RouteConstants.sessionStart);
+              }
+            },
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.history_rounded,
+              color: currentRoute == RouteConstants.sessionHistory
+                  ? AppColors.primary
+                  : AppColors.textSecondary,
+            ),
+            title: Text(
+              AppConstants.menuSessionHistoryLabel,
+              style: AppTypography.bodyLarge.copyWith(
+                color: currentRoute == RouteConstants.sessionHistory
+                    ? AppColors.primary
+                    : AppColors.textPrimary,
+                fontWeight: currentRoute == RouteConstants.sessionHistory
+                    ? FontWeight.bold
+                    : FontWeight.normal,
+              ),
+            ),
+            onTap: () {
+              Navigator.of(context).pop();
+              if (currentRoute != RouteConstants.sessionHistory) {
+                Navigator.of(context).popUntil((route) => route.isFirst);
+                Navigator.of(context).pushNamed(RouteConstants.sessionHistory);
               }
             },
           ),
@@ -248,7 +276,7 @@ class UserDrawer extends StatelessWidget {
             ),
             onTap: () {
               Navigator.of(context).pop();
-              showThemeSelectionBottomSheet(context);
+              showThemeSelectionBottomSheet(parentContext);
             },
           ),
           const Spacer(),
@@ -263,8 +291,9 @@ class UserDrawer extends StatelessWidget {
               ),
             ),
             onTap: () {
+              final authBloc = context.read<AuthBloc>();
               Navigator.of(context).pop();
-              _showLogoutConfirmationDialog(context);
+              _showLogoutConfirmationDialog(parentContext, authBloc);
             },
           ),
           const SizedBox(height: AppSpacing.lg),
