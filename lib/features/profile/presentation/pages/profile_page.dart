@@ -14,6 +14,7 @@ import '../../../../core/widgets/error_dialog.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
 import '../../../auth/presentation/bloc/auth_event.dart';
+import '../../domain/entities/profile_entity.dart';
 import '../bloc/profile_bloc.dart';
 import '../bloc/profile_event.dart';
 import '../bloc/profile_state.dart';
@@ -30,7 +31,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
-  bool _isEditingName = false;
+  bool _isEditing = false;
 
   @override
   void initState() {
@@ -46,13 +47,21 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void _onSavePressed(String techId, String expId) {
     if (_formKey.currentState!.validate()) {
-      context.read<ProfileBloc>().add(
-            UpdateProfileRequested(
-              name: _nameController.text.trim(),
-              technologyId: techId,
-              experienceId: expId,
-            ),
-          );
+      final profileState = context.read<ProfileBloc>().state;
+      if (profileState is ProfileLoaded) {
+        context.read<ProfileBloc>().add(
+              UpdateProfileRequested(
+                name: _nameController.text.trim(),
+                technologyId: techId,
+                experienceId: expId,
+                preferredJobRole: profileState.profile.preferredJobRole,
+                preferredLocation: profileState.profile.preferredLocation,
+                preferredWorkMode: profileState.profile.preferredWorkMode,
+                expectedSalary: profileState.profile.expectedSalary,
+                jobAlertEnabled: profileState.profile.jobAlertEnabled,
+              ),
+            );
+      }
     }
   }
 
@@ -104,12 +113,14 @@ class _ProfilePageState extends State<ProfilePage> {
               listener: (context, state) {
                 if (state is ProfileUpdateSuccess) {
                   setState(() {
-                    _isEditingName = false;
+                    _isEditing = false;
                   });
-                  SuccessDialog.show(
-                    context: context,
-                    title: 'Success',
-                    message: AppConstants.profileUpdateSuccess,
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text(AppConstants.profileUpdateSuccess),
+                      backgroundColor: AppColors.success,
+                      behavior: SnackBarBehavior.floating,
+                    ),
                   );
                   // Refresh currentUser in AuthBloc so name updates globally
                   context.read<AuthBloc>().add(LoadCurrentUser());
@@ -136,6 +147,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 String expId = '';
                 bool isSelectionConfigured = false;
 
+                String preferredJobRole = '';
+                String preferredLocation = '';
+                String preferredWorkMode = 'Remote';
+                double expectedSalary = 0.0;
+                bool jobAlertEnabled = false;
+
                 if (state is ProfileLoaded) {
                   displayName = state.profile.name;
                   if (state.profile.technology != null) {
@@ -147,10 +164,17 @@ class _ProfilePageState extends State<ProfilePage> {
                     expId = state.profile.experience!.id;
                   }
                   isSelectionConfigured = state.profile.technology != null && state.profile.experience != null;
+                  preferredJobRole = state.profile.preferredJobRole ?? '';
+                  preferredLocation = state.profile.preferredLocation ?? '';
+                  preferredWorkMode = state.profile.preferredWorkMode ?? 'Remote';
+                  expectedSalary = state.profile.expectedSalary ?? 0.0;
+                  jobAlertEnabled = state.profile.jobAlertEnabled ?? false;
                 }
 
-                if (!_isEditingName && _nameController.text != displayName) {
-                  _nameController.text = displayName;
+                if (!_isEditing) {
+                  if (_nameController.text != displayName) {
+                    _nameController.text = displayName;
+                  }
                 }
 
                 return SafeArea(
@@ -183,7 +207,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           const SizedBox(height: AppSpacing.xl),
 
                           // Editable Name Section
-                          if (_isEditingName) ...[
+                          if (_isEditing) ...[
                             CustomTextField(
                               labelText: AppConstants.nameLabel,
                               hintText: AppConstants.nameLabel,
@@ -213,7 +237,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         ? null
                                         : () {
                                             setState(() {
-                                              _isEditingName = false;
+                                              _isEditing = false;
                                               _nameController.text = displayName;
                                             });
                                           },
@@ -242,7 +266,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     ? null
                                     : () {
                                         setState(() {
-                                          _isEditingName = true;
+                                          _isEditing = true;
                                         });
                                       },
                               ),
@@ -261,6 +285,60 @@ class _ProfilePageState extends State<ProfilePage> {
                           ProfileInfoCardWidget(
                             label: AppConstants.approvalStatusLabel,
                             value: userStatus,
+                          ),
+
+                          const SizedBox(height: AppSpacing.lg),
+                          Divider(color: AppColors.border),
+                          const SizedBox(height: AppSpacing.lg),
+
+                          // Career Preferences Section
+                          Text(
+                            'Career Preferences',
+                            style: AppTypography.bodyLarge.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+
+                          InkWell(
+                            onTap: isUpdating || state is! ProfileLoaded ? null : () => _showEditPreferencesDialog(context, state.profile),
+                            borderRadius: BorderRadius.circular(AppDimensions.inputRadius),
+                            child: ProfileInfoCardWidget(
+                              label: 'Preferred Job Role',
+                              value: preferredJobRole.isNotEmpty ? preferredJobRole : AppConstants.notConfigured,
+                            ),
+                          ),
+                          InkWell(
+                            onTap: isUpdating || state is! ProfileLoaded ? null : () => _showEditPreferencesDialog(context, state.profile),
+                            borderRadius: BorderRadius.circular(AppDimensions.inputRadius),
+                            child: ProfileInfoCardWidget(
+                              label: 'Preferred Location',
+                              value: preferredLocation.isNotEmpty ? preferredLocation : AppConstants.notConfigured,
+                            ),
+                          ),
+                          InkWell(
+                            onTap: isUpdating || state is! ProfileLoaded ? null : () => _showEditPreferencesDialog(context, state.profile),
+                            borderRadius: BorderRadius.circular(AppDimensions.inputRadius),
+                            child: ProfileInfoCardWidget(
+                              label: 'Preferred Work Mode',
+                              value: preferredWorkMode.isNotEmpty ? preferredWorkMode : AppConstants.notConfigured,
+                            ),
+                          ),
+                          InkWell(
+                            onTap: isUpdating || state is! ProfileLoaded ? null : () => _showEditPreferencesDialog(context, state.profile),
+                            borderRadius: BorderRadius.circular(AppDimensions.inputRadius),
+                            child: ProfileInfoCardWidget(
+                              label: 'Expected Salary',
+                              value: expectedSalary > 0 ? expectedSalary.toStringAsFixed(0) : AppConstants.notConfigured,
+                            ),
+                          ),
+                          InkWell(
+                            onTap: isUpdating || state is! ProfileLoaded ? null : () => _showEditPreferencesDialog(context, state.profile),
+                            borderRadius: BorderRadius.circular(AppDimensions.inputRadius),
+                            child: ProfileInfoCardWidget(
+                              label: 'Job Alert Status',
+                              value: jobAlertEnabled ? 'Enabled' : 'Disabled',
+                            ),
                           ),
 
                           const SizedBox(height: AppSpacing.lg),
@@ -374,5 +452,249 @@ class _ProfilePageState extends State<ProfilePage> {
         ],
       ),
     );
+  }
+
+  void _showEditPreferencesDialog(BuildContext context, ProfileEntity profile) {
+    final formKey = GlobalKey<FormState>();
+    final jobRoleController = TextEditingController(text: profile.preferredJobRole ?? '');
+    final locationController = TextEditingController(text: profile.preferredLocation ?? '');
+    final expectedSalaryController = TextEditingController(
+      text: (profile.expectedSalary != null && profile.expectedSalary! > 0)
+          ? profile.expectedSalary!.toStringAsFixed(0)
+          : '',
+    );
+    String selectedWorkMode = (profile.preferredWorkMode != null && profile.preferredWorkMode!.isNotEmpty)
+        ? profile.preferredWorkMode!
+        : 'Remote';
+    bool jobAlertEnabled = profile.jobAlertEnabled ?? false;
+
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: '',
+      barrierColor: AppColors.black.withValues(alpha: 0.5),
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (dialogContext, anim1, anim2) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return Dialog(
+              backgroundColor: AppColors.surface,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                side: BorderSide(color: AppColors.border),
+                borderRadius: BorderRadius.circular(AppDimensions.cardRadius),
+              ),
+              child: Container(
+                constraints: const BoxConstraints(
+                  maxWidth: AppDimensions.maxContentWidth - 100,
+                ),
+                padding: const EdgeInsets.all(AppSpacing.xl),
+                child: SingleChildScrollView(
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          'Edit Career Preferences',
+                          style: AppTypography.headingSmall.copyWith(
+                            color: AppColors.textPrimary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
+                        CustomTextField(
+                          controller: jobRoleController,
+                          labelText: 'Preferred Job Role',
+                          hintText: 'e.g. Senior Java Developer',
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Preferred job role is required';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        CustomTextField(
+                          controller: locationController,
+                          labelText: 'Preferred Location',
+                          hintText: 'e.g. Bangalore, Remote',
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Preferred location is required';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Preferred Work Mode',
+                              style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w500),
+                            ),
+                            const SizedBox(height: AppSpacing.sm),
+                            DropdownButtonFormField<String>(
+                              initialValue: selectedWorkMode,
+                              style: AppTypography.bodyLarge.copyWith(color: AppColors.textPrimary),
+                              dropdownColor: AppColors.surface,
+                              decoration: const InputDecoration(
+                                hintText: 'Select Work Mode',
+                              ),
+                              items: const [
+                                DropdownMenuItem(value: 'Remote', child: Text('Remote')),
+                                DropdownMenuItem(value: 'Hybrid', child: Text('Hybrid')),
+                                DropdownMenuItem(value: 'Onsite', child: Text('Onsite')),
+                              ],
+                              onChanged: (value) {
+                                if (value != null) {
+                                  setDialogState(() {
+                                    selectedWorkMode = value;
+                                  });
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        CustomTextField(
+                          controller: expectedSalaryController,
+                          labelText: 'Expected Salary',
+                          hintText: 'e.g. 1500000',
+                          keyboardType: TextInputType.number,
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Expected salary is required';
+                            }
+                            final salary = double.tryParse(value.trim());
+                            if (salary == null || salary <= 0) {
+                              return 'Please enter a positive number';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.lg,
+                            vertical: AppSpacing.sm,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.surface,
+                            borderRadius: BorderRadius.circular(AppDimensions.inputRadius),
+                            border: Border.all(
+                              color: AppColors.border.withValues(alpha: AppDimensions.opacityBorder),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Job Alert Enabled',
+                                      style: AppTypography.bodyMedium.copyWith(
+                                        color: AppColors.textSecondary,
+                                      ),
+                                    ),
+                                    const SizedBox(height: AppSpacing.xs),
+                                    Text(
+                                      jobAlertEnabled ? 'Enabled' : 'Disabled',
+                                      style: AppTypography.bodyLarge.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Switch(
+                                value: jobAlertEnabled,
+                                activeThumbColor: AppColors.primary,
+                                onChanged: (value) {
+                                  setDialogState(() {
+                                    jobAlertEnabled = value;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.xl),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextButton(
+                                onPressed: () {
+                                  Navigator.of(dialogContext).pop();
+                                },
+                                child: Text(
+                                  AppConstants.cancelChangesButton,
+                                  style: AppTypography.bodyLarge.copyWith(
+                                    color: AppColors.textSecondary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacing.md),
+                            Expanded(
+                              child: CustomButton(
+                                text: AppConstants.btnSave,
+                                onPressed: () {
+                                  if (formKey.currentState!.validate()) {
+                                    final double salary = double.parse(expectedSalaryController.text.trim());
+                                    final techId = profile.technology?.id ?? '';
+                                    final expId = profile.experience?.id ?? '';
+                                    
+                                    // Close Dialog
+                                    Navigator.of(dialogContext).pop();
+
+                                    // Dispatch Update Event
+                                    context.read<ProfileBloc>().add(
+                                      UpdateProfileRequested(
+                                        name: profile.name,
+                                        technologyId: techId,
+                                        experienceId: expId,
+                                        preferredJobRole: jobRoleController.text.trim(),
+                                        preferredLocation: locationController.text.trim(),
+                                        preferredWorkMode: selectedWorkMode,
+                                        expectedSalary: salary,
+                                        jobAlertEnabled: jobAlertEnabled,
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+      transitionBuilder: (context, anim1, anim2, child) {
+        final curve = CurvedAnimation(parent: anim1, curve: Curves.easeOutBack);
+        return ScaleTransition(
+          scale: curve,
+          child: FadeTransition(
+            opacity: anim1,
+            child: child,
+          ),
+        );
+      },
+    ).then((_) {
+      jobRoleController.dispose();
+      locationController.dispose();
+      expectedSalaryController.dispose();
+    });
   }
 }

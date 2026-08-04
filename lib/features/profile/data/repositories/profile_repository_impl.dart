@@ -21,9 +21,27 @@ class ProfileRepositoryImpl implements ProfileRepository {
   }
 
   @override
-  Future<ProfileEntity> updateProfile(String name, String technologyId, String experienceId) async {
+  Future<ProfileEntity> updateProfile(
+    String name,
+    String technologyId,
+    String experienceId, {
+    String? preferredJobRole,
+    String? preferredLocation,
+    String? preferredWorkMode,
+    double? expectedSalary,
+    bool? jobAlertEnabled,
+  }) async {
     try {
-      final model = await _remoteDataSource.updateProfile(name, technologyId, experienceId);
+      final model = await _remoteDataSource.updateProfile(
+        name,
+        technologyId,
+        experienceId,
+        preferredJobRole: preferredJobRole,
+        preferredLocation: preferredLocation,
+        preferredWorkMode: preferredWorkMode,
+        expectedSalary: expectedSalary,
+        jobAlertEnabled: jobAlertEnabled,
+      );
       return model.toEntity();
     } on DioException catch (e) {
       throw _mapDioException(e);

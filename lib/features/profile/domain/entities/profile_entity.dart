@@ -10,6 +10,12 @@ class ProfileEntity extends Equatable {
   final String role;
   final TechnologyEntity? technology;
   final ExperienceEntity? experience;
+  final String? preferredJobRole;
+  final String? preferredLocation;
+  final String? preferredWorkMode;
+  final double? expectedSalary;
+  final bool? jobAlertEnabled;
+  final String? profileStatus;
 
   const ProfileEntity({
     required this.userId,
@@ -19,8 +25,28 @@ class ProfileEntity extends Equatable {
     required this.role,
     this.technology,
     this.experience,
+    this.preferredJobRole,
+    this.preferredLocation,
+    this.preferredWorkMode,
+    this.expectedSalary,
+    this.jobAlertEnabled,
+    this.profileStatus,
   });
 
   @override
-  List<Object?> get props => [userId, name, email, phoneNumber, role, technology, experience];
+  List<Object?> get props => [
+        userId,
+        name,
+        email,
+        phoneNumber,
+        role,
+        technology,
+        experience,
+        preferredJobRole,
+        preferredLocation,
+        preferredWorkMode,
+        expectedSalary,
+        jobAlertEnabled,
+        profileStatus,
+      ];
 }

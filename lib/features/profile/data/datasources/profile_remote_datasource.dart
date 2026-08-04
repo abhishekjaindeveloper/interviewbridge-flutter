@@ -4,7 +4,16 @@ import '../models/profile_model.dart';
 
 abstract class ProfileRemoteDataSource {
   Future<ProfileModel> getProfile();
-  Future<ProfileModel> updateProfile(String name, String technologyId, String experienceId);
+  Future<ProfileModel> updateProfile(
+    String name,
+    String technologyId,
+    String experienceId, {
+    String? preferredJobRole,
+    String? preferredLocation,
+    String? preferredWorkMode,
+    double? expectedSalary,
+    bool? jobAlertEnabled,
+  });
   Future<ProfileModel> setupProfile(String technologyId, String experienceId);
 }
 
@@ -21,13 +30,37 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   }
 
   @override
-  Future<ProfileModel> updateProfile(String name, String technologyId, String experienceId) async {
+  Future<ProfileModel> updateProfile(
+    String name,
+    String technologyId,
+    String experienceId, {
+    String? preferredJobRole,
+    String? preferredLocation,
+    String? preferredWorkMode,
+    double? expectedSalary,
+    bool? jobAlertEnabled,
+  }) async {
     final Map<String, dynamic> body = {'name': name};
     if (technologyId.isNotEmpty) {
       body['technologyId'] = technologyId;
     }
     if (experienceId.isNotEmpty) {
       body['experienceId'] = experienceId;
+    }
+    if (preferredJobRole != null) {
+      body['preferredJobRole'] = preferredJobRole;
+    }
+    if (preferredLocation != null) {
+      body['preferredLocation'] = preferredLocation;
+    }
+    if (preferredWorkMode != null) {
+      body['preferredWorkMode'] = preferredWorkMode;
+    }
+    if (expectedSalary != null) {
+      body['expectedSalary'] = expectedSalary;
+    }
+    if (jobAlertEnabled != null) {
+      body['jobAlertEnabled'] = jobAlertEnabled;
     }
     final response = await _apiClient.put(
       ApiConstants.userProfile,

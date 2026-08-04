@@ -277,10 +277,12 @@ class _PracticeSessionPageState extends State<PracticeSessionPage> {
     String expId = '';
 
     if (profileState is ProfileLoaded) {
-      if (profileState.profile.technology != null && profileState.profile.experience != null) {
-        isProfileComplete = true;
+      isProfileComplete = profileState.profile.profileStatus == 'COMPLETED';
+      if (profileState.profile.technology != null) {
         techName = profileState.profile.technology!.name;
         techId = profileState.profile.technology!.id;
+      }
+      if (profileState.profile.experience != null) {
         expLabel = profileState.profile.experience!.experienceLabel;
         expId = profileState.profile.experience!.id;
       }

@@ -11,6 +11,12 @@ class ProfileModel extends ProfileEntity {
     required super.role,
     super.technology,
     super.experience,
+    super.preferredJobRole,
+    super.preferredLocation,
+    super.preferredWorkMode,
+    super.expectedSalary,
+    super.jobAlertEnabled,
+    super.profileStatus,
   });
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) {
@@ -26,6 +32,12 @@ class ProfileModel extends ProfileEntity {
       experience: json['experience'] != null
           ? ExperienceModel.fromJson(json['experience'] as Map<String, dynamic>)
           : null,
+      preferredJobRole: json['preferredJobRole'] as String?,
+      preferredLocation: json['preferredLocation'] as String?,
+      preferredWorkMode: json['preferredWorkMode'] as String?,
+      expectedSalary: (json['expectedSalary'] as num?)?.toDouble(),
+      jobAlertEnabled: json['jobAlertEnabled'] as bool?,
+      profileStatus: json['profileStatus'] as String?,
     );
   }
 
@@ -38,6 +50,12 @@ class ProfileModel extends ProfileEntity {
       'role': role,
       'technology': technology != null ? (technology as TechnologyModel).toJson() : null,
       'experience': experience != null ? (experience as ExperienceModel).toJson() : null,
+      'preferredJobRole': preferredJobRole,
+      'preferredLocation': preferredLocation,
+      'preferredWorkMode': preferredWorkMode,
+      'expectedSalary': expectedSalary,
+      'jobAlertEnabled': jobAlertEnabled,
+      'profileStatus': profileStatus,
     };
   }
 
@@ -50,6 +68,12 @@ class ProfileModel extends ProfileEntity {
       role: role,
       technology: technology,
       experience: experience,
+      preferredJobRole: preferredJobRole,
+      preferredLocation: preferredLocation,
+      preferredWorkMode: preferredWorkMode,
+      expectedSalary: expectedSalary,
+      jobAlertEnabled: jobAlertEnabled,
+      profileStatus: profileStatus,
     );
   }
 }

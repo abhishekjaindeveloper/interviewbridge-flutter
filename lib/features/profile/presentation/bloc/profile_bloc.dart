@@ -50,6 +50,11 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         event.name,
         event.technologyId,
         event.experienceId,
+        preferredJobRole: event.preferredJobRole,
+        preferredLocation: event.preferredLocation,
+        preferredWorkMode: event.preferredWorkMode,
+        expectedSalary: event.expectedSalary,
+        jobAlertEnabled: event.jobAlertEnabled,
       );
       emit(ProfileUpdateSuccess(profile));
       emit(ProfileLoaded(profile)); // Re-emit loaded so UI displays updated state

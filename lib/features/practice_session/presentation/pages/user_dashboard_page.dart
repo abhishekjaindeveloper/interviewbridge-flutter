@@ -229,10 +229,13 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
     String techName = AppConstants.notConfigured;
     String expLabel = AppConstants.notConfigured;
     if (profileState is ProfileLoaded) {
-      if (profileState.profile.technology != null && profileState.profile.experience != null) {
-        isProfileComplete = true;
-        techName = profileState.profile.technology!.name;
-        expLabel = profileState.profile.experience!.experienceLabel;
+      final p = profileState.profile;
+      isProfileComplete = p.profileStatus == 'COMPLETED';
+      if (p.technology != null) {
+        techName = p.technology!.name;
+      }
+      if (p.experience != null) {
+        expLabel = p.experience!.experienceLabel;
       }
     }
 
@@ -408,8 +411,8 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                                 title: 'Profile Setup',
                                 icon: isProfileComplete ? Icons.verified_user_outlined : Icons.warning_amber_outlined,
                                 iconColor: isProfileComplete ? AppColors.success : AppColors.warning,
-                                value: isProfileComplete ? techName : 'Incomplete',
-                                subtitle: isProfileComplete ? expLabel : 'Configure selections',
+                                value: isProfileComplete ? 'Completed' : 'Incomplete',
+                                subtitle: isProfileComplete ? '$techName ($expLabel)' : 'Configure selections',
                               ),
                             ],
                           );
