@@ -81,7 +81,9 @@ class _TechnologyExperienceSelectionPageState extends State<TechnologyExperience
               title: 'Success',
               message: AppConstants.selectionSuccess,
             );
-            Navigator.of(context).pop();
+            if (Navigator.canPop(context)) {
+              Navigator.of(context).pop();
+            }
           } else if (state is ProfileError) {
             ErrorDialog.show(
               context: context,

@@ -16,6 +16,8 @@ import '../../../evaluation/presentation/bloc/evaluation_bloc.dart';
 import '../../../evaluation/presentation/bloc/evaluation_event.dart';
 import '../../../profile/presentation/bloc/profile_bloc.dart';
 import '../../../profile/presentation/bloc/profile_event.dart';
+import '../../../profile/presentation/bloc/profile_state.dart';
+import '../../../profile/presentation/pages/technology_experience_selection_page.dart';
 import '../../../technology/presentation/bloc/technology_bloc.dart';
 import '../../../technology/presentation/bloc/technology_event.dart';
 import '../../../experience/presentation/bloc/experience_bloc.dart';
@@ -33,6 +35,7 @@ class AuthWrapper extends StatefulWidget {
 
 class _AuthWrapperState extends State<AuthWrapper> {
   bool _hasInitialCheckCompleted = false;
+  bool _hasAdmittedToDashboard = false;
 
   @override
   void initState() {
@@ -61,6 +64,9 @@ class _AuthWrapperState extends State<AuthWrapper> {
         }
 
         if (state is Unauthenticated) {
+          _hasAdmittedToDashboard = false;
+          _hasInitialCheckCompleted = false;
+
           context.read<PracticeSessionBloc>().add(ResetSessionState());
           context.read<QuestionBloc>().add(ResetQuestionState());
           context.read<EvaluationBloc>().add(ResetEvaluationState());
@@ -123,6 +129,52 @@ class _AuthWrapperState extends State<AuthWrapper> {
           if (state.user.role == 'ROLE_ADMIN') {
             return const AdminDashboardPage();
           }
+
+          // Candidate User Flow: Avoid rebuild loops once admitted to Dashboard
+          if (_hasAdmittedToDashboard) {
+            return const UserDashboardPage();
+          }
+
+          final profileState = context.watch<ProfileBloc>().state;
+          if (profileState is ProfileInitial) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (context.mounted) {
+                context.read<ProfileBloc>().add(LoadProfile());
+              }
+            });
+            return const Scaffold(
+              body: LoadingIndicator(),
+            );
+          } else if (profileState is ProfileLoading) {
+            return const Scaffold(
+              body: LoadingIndicator(),
+            );
+          } else if (profileState is ProfileLoaded) {
+            final isComplete = profileState.profile.profileStatus == 'COMPLETED';
+            if (isComplete) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted && !_hasAdmittedToDashboard) {
+                  setState(() {
+                    _hasAdmittedToDashboard = true;
+                  });
+                }
+              });
+              return const UserDashboardPage();
+            } else {
+              return const TechnologyExperienceSelectionPage();
+            }
+          } else if (profileState is ProfileError) {
+            // Safety fallback on ProfileError: admit to Dashboard to prevent stuck loading
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted && !_hasAdmittedToDashboard) {
+                setState(() {
+                  _hasAdmittedToDashboard = true;
+                });
+              }
+            });
+            return const UserDashboardPage();
+          }
+
           return const UserDashboardPage();
         } else {
           return const LoginPage();

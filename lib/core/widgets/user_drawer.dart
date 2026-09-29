@@ -266,6 +266,34 @@ class UserDrawer extends StatelessWidget {
             },
           ),
           ListTile(
+            leading: Icon(
+              currentRoute == RouteConstants.careerPilotJobs
+                  ? Icons.work_rounded
+                  : Icons.work_outline_rounded,
+              color: currentRoute == RouteConstants.careerPilotJobs
+                  ? AppColors.primary
+                  : AppColors.textSecondary,
+            ),
+            title: Text(
+              'CareerPilot Jobs',
+              style: AppTypography.bodyLarge.copyWith(
+                color: currentRoute == RouteConstants.careerPilotJobs
+                    ? AppColors.primary
+                    : AppColors.textPrimary,
+                fontWeight: currentRoute == RouteConstants.careerPilotJobs
+                    ? FontWeight.bold
+                    : FontWeight.normal,
+              ),
+            ),
+            onTap: () {
+              Navigator.of(context).pop();
+              if (currentRoute != RouteConstants.careerPilotJobs) {
+                Navigator.of(context).popUntil((route) => route.isFirst);
+                Navigator.of(context).pushNamed(RouteConstants.careerPilotJobs);
+              }
+            },
+          ),
+          ListTile(
             leading: const Icon(Icons.palette_outlined, color: AppColors.primary),
             title: Text(
               AppConstants.themeLabel,

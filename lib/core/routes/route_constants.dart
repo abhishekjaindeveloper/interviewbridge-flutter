@@ -16,5 +16,7 @@ class RouteConstants {
   static const String termsConditions = '/terms-conditions';
   static const String privacyPolicy = '/privacy-policy';
   static const String profile = '/profile';
+  static const String careerPilotJobs = '/career-pilot/jobs';
+  static const String careerPilotJobDetails = '/career-pilot/job-details';
 }
 

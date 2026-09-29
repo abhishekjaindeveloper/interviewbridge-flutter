@@ -12,6 +12,8 @@ import '../../features/practice_session/presentation/pages/session_history_page.
 import '../../features/question/presentation/pages/question_page.dart';
 import '../../features/evaluation/presentation/pages/evaluation_page.dart';
 import '../../features/admin/presentation/pages/admin_dashboard_page.dart';
+import '../../features/career_pilot/presentation/pages/career_pilot_jobs_page.dart';
+import '../../features/career_pilot/presentation/pages/job_details_page.dart';
 import 'route_constants.dart';
 
 class AppRouter {
@@ -75,6 +77,17 @@ class AppRouter {
         return MaterialPageRoute(
           settings: settings,
           builder: (_) => const AdminDashboardPage(),
+        );
+      case RouteConstants.careerPilotJobs:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const CareerPilotJobsPage(),
+        );
+      case RouteConstants.careerPilotJobDetails:
+        final jobId = settings.arguments as String;
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => JobDetailsPage(jobId: jobId),
         );
       case RouteConstants.sessionActive:
         final sessionId = settings.arguments as String;

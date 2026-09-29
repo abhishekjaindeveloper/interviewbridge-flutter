@@ -17,6 +17,7 @@ import 'features/profile/profile_injection.dart';
 import 'features/practice_session/practice_session_injection.dart';
 import 'features/question/question_injection.dart';
 import 'features/evaluation/evaluation_injection.dart';
+import 'features/career_pilot/career_pilot_injection.dart';
 
 final sl = GetIt.instance;
 
@@ -58,4 +59,5 @@ Future<void> init() async {
   initPracticeSession(sl);
   initQuestion(sl);
   initEvaluation(sl);
+  initCareerPilot(sl);
 }

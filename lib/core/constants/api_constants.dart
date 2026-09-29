@@ -7,7 +7,7 @@ enum AppEnvironment {
 class ApiConstants {
   ApiConstants._();
 
-  static const String _devUrl = 'http://10.170.226.95:9000';
+  static const String _devUrl = 'http://10.73.240.94:9000';
   static const String _stagingUrl = 'https://staging-api.interviewbridge.com';
   static const String _prodUrl = 'https://api.interviewbridge.com';
 
@@ -18,7 +18,7 @@ class ApiConstants {
         return AppEnvironment.staging;
       case 'prod':
       case 'production':
-        return AppEnvironment.production;
+        return AppEnvironment.production; 
       case 'dev':
       case 'development':
       default:
@@ -80,4 +80,9 @@ class ApiConstants {
   static String submitAnswerUrl(String questionId) => '$practiceQuestions/$questionId/answer';
   static String evaluateQuestionUrl(String questionId) => '$practiceQuestions/$questionId/evaluate';
   static String questionEvaluationUrl(String questionId) => '$practiceQuestions/$questionId/evaluation';
+
+  // CareerPilot Endpoints
+  static const String userJobs = '/api/user/jobs';
+  static const String userMatchedJobs = '/api/user/jobs/matched';
+  static String userJobDetailsUrl(String id) => '$userJobs/$id';
 }

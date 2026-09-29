@@ -422,7 +422,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
 
                       // 3. Quick Actions
                       Text(
-                        'Start Practicing',
+                        'Explore & Practice',
                         style: AppTypography.headingSmall.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -433,7 +433,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                           Expanded(
                             child: _buildActionCard(
                               title: 'Practice Session',
-                              subtitle: 'Start customizable practice set tailored to your role',
+                              subtitle: 'Start practice set tailored to your role',
                               icon: Icons.forum_rounded,
                               color: AppColors.primary,
                               onTap: () {
@@ -444,16 +444,26 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                           const SizedBox(width: AppSpacing.md),
                           Expanded(
                             child: _buildActionCard(
-                              title: 'Session History',
-                              subtitle: 'Review detailed AI responses & evaluations',
-                              icon: Icons.history_rounded,
-                              color: AppColors.secondary,
+                              title: 'CareerPilot Jobs',
+                              subtitle: 'Explore AI-matched jobs for your profile',
+                              icon: Icons.work_outline_rounded,
+                              color: AppColors.success,
                               onTap: () {
-                                Navigator.of(context).pushNamed(RouteConstants.sessionHistory);
+                                Navigator.of(context).pushNamed(RouteConstants.careerPilotJobs);
                               },
                             ),
                           ),
                         ],
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      _buildActionCard(
+                        title: 'Session History',
+                        subtitle: 'Review detailed AI responses & evaluations from past practice sessions',
+                        icon: Icons.history_rounded,
+                        color: AppColors.secondary,
+                        onTap: () {
+                          Navigator.of(context).pushNamed(RouteConstants.sessionHistory);
+                        },
                       ),
                       const SizedBox(height: AppSpacing.xxl),
 
