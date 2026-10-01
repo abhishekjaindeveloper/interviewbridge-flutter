@@ -10,6 +10,7 @@ import '../../../../core/routes/route_constants.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/user_drawer.dart';
 import '../../../profile/presentation/bloc/profile_bloc.dart';
+import '../../../profile/presentation/bloc/profile_event.dart';
 import '../../../profile/presentation/bloc/profile_state.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
@@ -34,6 +35,10 @@ class _PracticeSessionPageState extends State<PracticeSessionPage> {
   void initState() {
     super.initState();
     context.read<PracticeSessionBloc>().add(LoadSessionHistoryRequested());
+    final profileState = context.read<ProfileBloc>().state;
+    if (profileState is! ProfileLoaded) {
+      context.read<ProfileBloc>().add(LoadProfile());
+    }
   }
 
   void _showProfileSetupRequiredDialog(BuildContext context) {
@@ -270,14 +275,13 @@ class _PracticeSessionPageState extends State<PracticeSessionPage> {
   @override
   Widget build(BuildContext context) {
     final profileState = context.watch<ProfileBloc>().state;
-    bool isProfileComplete = false;
+    bool isInterviewReady = false;
     String techName = '';
     String techId = '';
     String expLabel = '';
     String expId = '';
 
     if (profileState is ProfileLoaded) {
-      isProfileComplete = profileState.profile.profileStatus == 'COMPLETED';
       if (profileState.profile.technology != null) {
         techName = profileState.profile.technology!.name;
         techId = profileState.profile.technology!.id;
@@ -286,6 +290,7 @@ class _PracticeSessionPageState extends State<PracticeSessionPage> {
         expLabel = profileState.profile.experience!.experienceLabel;
         expId = profileState.profile.experience!.id;
       }
+      isInterviewReady = techId.isNotEmpty && expId.isNotEmpty;
     }
     final authState = context.watch<AuthBloc>().state;
     String userName = 'User';
@@ -350,7 +355,7 @@ class _PracticeSessionPageState extends State<PracticeSessionPage> {
           builder: (context, state) {
             final isLoading = state is PracticeSessionLoading;
 
-            if (!isProfileComplete) {
+            if (!isInterviewReady) {
               return Center(
                 child: Padding(
                   padding: const EdgeInsets.all(AppSpacing.xl),
@@ -494,7 +499,7 @@ class _PracticeSessionPageState extends State<PracticeSessionPage> {
                                 onPressed: isLoading
                                     ? null
                                     : () {
-                                        if (!isProfileComplete) {
+                                        if (!isInterviewReady) {
                                           _showProfileSetupRequiredDialog(context);
                                         } else {
                                           _onStartSessionPressed(techId, expId);

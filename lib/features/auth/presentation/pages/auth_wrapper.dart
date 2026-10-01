@@ -150,8 +150,11 @@ class _AuthWrapperState extends State<AuthWrapper> {
               body: LoadingIndicator(),
             );
           } else if (profileState is ProfileLoaded) {
-            final isComplete = profileState.profile.profileStatus == 'COMPLETED';
-            if (isComplete) {
+            final hasInterviewSetup = profileState.profile.technology != null &&
+                profileState.profile.experience != null &&
+                profileState.profile.technology!.id.isNotEmpty &&
+                profileState.profile.experience!.id.isNotEmpty;
+            if (hasInterviewSetup) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 if (mounted && !_hasAdmittedToDashboard) {
                   setState(() {

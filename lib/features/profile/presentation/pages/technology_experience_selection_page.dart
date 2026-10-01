@@ -53,12 +53,32 @@ class _TechnologyExperienceSelectionPageState extends State<TechnologyExperience
       return;
     }
 
-    context.read<ProfileBloc>().add(
-          SetupProfileSelection(
-            technologyId: _selectedTechnologyId!,
-            experienceId: _selectedExperienceId!,
-          ),
-        );
+    final profileState = context.read<ProfileBloc>().state;
+    final isAlreadyConfigured = profileState is ProfileLoaded &&
+        (profileState.profile.technology != null || profileState.profile.experience != null);
+
+    if (isAlreadyConfigured) {
+      final currentProfile = profileState.profile;
+      context.read<ProfileBloc>().add(
+            UpdateProfileRequested(
+              name: currentProfile.name,
+              technologyId: _selectedTechnologyId!,
+              experienceId: _selectedExperienceId!,
+              preferredJobRole: currentProfile.preferredJobRole,
+              preferredLocation: currentProfile.preferredLocation,
+              preferredWorkMode: currentProfile.preferredWorkMode,
+              expectedSalary: currentProfile.expectedSalary,
+              jobAlertEnabled: currentProfile.jobAlertEnabled,
+            ),
+          );
+    } else {
+      context.read<ProfileBloc>().add(
+            SetupProfileSelection(
+              technologyId: _selectedTechnologyId!,
+              experienceId: _selectedExperienceId!,
+            ),
+          );
+    }
   }
 
   @override
@@ -75,7 +95,7 @@ class _TechnologyExperienceSelectionPageState extends State<TechnologyExperience
       ),
       body: BlocListener<ProfileBloc, ProfileState>(
         listener: (context, state) {
-          if (state is ProfileSetupSuccess) {
+          if (state is ProfileSetupSuccess || state is ProfileUpdateSuccess) {
             SuccessDialog.show(
               context: context,
               title: 'Success',
