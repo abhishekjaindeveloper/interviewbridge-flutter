@@ -176,6 +176,7 @@ class EvaluationBloc extends Bloc<EvaluationEvent, EvaluationState> {
               questionNumber: q.questionNumber,
               question: q.question,
               userAnswer: q.userAnswer,
+              referenceAnswer: q.referenceAnswer,
               translatedAnswer: eval.translatedAnswer,
               improvedAnswer: eval.improvedAnswer,
               explanation: eval.explanation,

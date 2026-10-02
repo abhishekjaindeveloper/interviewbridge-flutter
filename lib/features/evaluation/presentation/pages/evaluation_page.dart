@@ -29,34 +29,67 @@ class EvaluationPage extends StatefulWidget {
 }
 
 class _EvaluationPageState extends State<EvaluationPage> {
+  bool _isNavigating = false;
+
   @override
   void initState() {
     super.initState();
     context.read<EvaluationBloc>().add(LoadSessionQuestionsRequested(widget.sessionId));
   }
 
+  void _handleBack(BuildContext context) {
+    if (_isNavigating) return;
+    _isNavigating = true;
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    } else {
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        RouteConstants.home,
+        (route) => false,
+      );
+    }
+  }
+
+  void _handleFinishSession(BuildContext context) {
+    if (_isNavigating) return;
+    _isNavigating = true;
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      RouteConstants.home,
+      (route) => false,
+    );
+  }
+
+  void _handleBackToHistory(BuildContext context) {
+    if (_isNavigating) return;
+    _isNavigating = true;
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      RouteConstants.sessionHistory,
+      (route) => route.settings.name == RouteConstants.home || route.isFirst,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text(
-          AppConstants.evaluationPageTitle,
-          style: AppTypography.headingMedium,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        _handleBack(context);
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppBar(
+          title: Text(
+            AppConstants.evaluationPageTitle,
+            style: AppTypography.headingMedium,
+          ),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => _handleBack(context),
+          ),
         ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            if (Navigator.of(context).canPop()) {
-              Navigator.of(context).pop();
-            } else {
-              Navigator.of(context).pushReplacementNamed(RouteConstants.home);
-            }
-          },
-        ),
-      ),
       body: BlocConsumer<EvaluationBloc, EvaluationState>(
         listener: (context, state) {
           if (state is EvaluationLoaded && state.evaluateError != null) {
@@ -158,8 +191,9 @@ class _EvaluationPageState extends State<EvaluationPage> {
           return const SizedBox.shrink();
         },
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildAverageScoreHeader(double averageScore) {
     return Container(
@@ -177,13 +211,17 @@ class _EvaluationPageState extends State<EvaluationPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            AppConstants.averageScoreLabel,
-            style: AppTypography.bodyMedium.copyWith(
-              fontWeight: FontWeight.bold,
-              color: AppColors.textSecondary,
+          Expanded(
+            child: Text(
+              AppConstants.averageScoreLabel,
+              style: AppTypography.bodyMedium.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColors.textSecondary,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
+          const SizedBox(width: AppSpacing.sm),
           Container(
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.md,
@@ -415,11 +453,13 @@ class _EvaluationPageState extends State<EvaluationPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    AppConstants.questionOfTotal(activeQuestion.questionNumber, state.questions.length),
-                    style: AppTypography.bodyMedium.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textSecondary,
+                  Expanded(
+                    child: Text(
+                      AppConstants.questionOfTotal(activeQuestion.questionNumber, state.questions.length),
+                      style: AppTypography.bodyMedium.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textSecondary,
+                      ),
                     ),
                   ),
                   Container(
@@ -459,17 +499,16 @@ class _EvaluationPageState extends State<EvaluationPage> {
         ),
         const SizedBox(height: AppSpacing.lg),
 
-        // User Answer Section (always visible if answered)
-        if (isAnswered) ...[
+        // User Answer Section (when answered and not yet evaluated)
+        if (isAnswered && !isEvaluated) ...[
           EvaluationSectionWidget(
             icon: Icons.person_outline_rounded,
             title: AppConstants.userAnswerTitle,
             content: activeQuestion.userAnswer ?? '',
             accentColor: AppColors.primaryLight,
           ),
+          const SizedBox(height: AppSpacing.md),
         ],
-
-        const SizedBox(height: AppSpacing.md),
 
         // Evaluation status or actions
         if (!isAnswered) ...[
@@ -550,12 +589,50 @@ class _EvaluationPageState extends State<EvaluationPage> {
             ),
           ),
         ] else ...[
-          // Show evaluated feedback details
+          // Show evaluated feedback details in exact recommended order
           if (state.activeEvaluation != null) ...[
+            // 1. Score
             ScoreCardWidget(score: state.activeEvaluation!.score ?? 0),
             const SizedBox(height: AppSpacing.lg),
+
+            // 2. User Answer
+            if ((activeQuestion.userAnswer != null && activeQuestion.userAnswer!.trim().isNotEmpty) ||
+                (state.activeEvaluation!.userAnswer.trim().isNotEmpty)) ...[
+              EvaluationSectionWidget(
+                icon: Icons.person_outline_rounded,
+                title: AppConstants.userAnswerTitle,
+                content: (activeQuestion.userAnswer != null && activeQuestion.userAnswer!.trim().isNotEmpty)
+                    ? activeQuestion.userAnswer!
+                    : state.activeEvaluation!.userAnswer,
+                accentColor: AppColors.primaryLight,
+              ),
+            ],
+
+            // 3. What Was Correct
+            if (state.activeEvaluation!.whatWasCorrect != null &&
+                state.activeEvaluation!.whatWasCorrect!.trim().isNotEmpty) ...[
+              EvaluationSectionWidget(
+                icon: Icons.check_circle_outline_rounded,
+                title: AppConstants.whatWasCorrectTitle,
+                content: state.activeEvaluation!.whatWasCorrect!,
+                accentColor: AppColors.success,
+              ),
+            ],
+
+            // 4. What Was Missing
+            if (state.activeEvaluation!.whatWasMissing != null &&
+                state.activeEvaluation!.whatWasMissing!.trim().isNotEmpty) ...[
+              EvaluationSectionWidget(
+                icon: Icons.help_outline_rounded,
+                title: AppConstants.whatWasMissingTitle,
+                content: state.activeEvaluation!.whatWasMissing!,
+                accentColor: AppColors.warning,
+              ),
+            ],
+
+            // 5. Translated Answer
             if (state.activeEvaluation!.translatedAnswer != null &&
-                state.activeEvaluation!.translatedAnswer!.isNotEmpty) ...[
+                state.activeEvaluation!.translatedAnswer!.trim().isNotEmpty) ...[
               EvaluationSectionWidget(
                 icon: Icons.g_translate_rounded,
                 title: AppConstants.translatedAnswerTitle,
@@ -564,8 +641,10 @@ class _EvaluationPageState extends State<EvaluationPage> {
                 initiallyExpanded: false,
               ),
             ],
+
+            // 6. Improved Answer
             if (state.activeEvaluation!.improvedAnswer != null &&
-                state.activeEvaluation!.improvedAnswer!.isNotEmpty) ...[
+                state.activeEvaluation!.improvedAnswer!.trim().isNotEmpty) ...[
               EvaluationSectionWidget(
                 icon: Icons.auto_awesome,
                 title: AppConstants.improvedAnswerTitle,
@@ -573,8 +652,10 @@ class _EvaluationPageState extends State<EvaluationPage> {
                 accentColor: AppColors.success,
               ),
             ],
+
+            // 7. Explanation
             if (state.activeEvaluation!.explanation != null &&
-                state.activeEvaluation!.explanation!.isNotEmpty) ...[
+                state.activeEvaluation!.explanation!.trim().isNotEmpty) ...[
               EvaluationSectionWidget(
                 icon: Icons.feedback_outlined,
                 title: AppConstants.explanationTitle,
@@ -603,39 +684,11 @@ class _EvaluationPageState extends State<EvaluationPage> {
       children: [
         CustomButton(
           text: AppConstants.closeSessionButton,
-          onPressed: () {
-            bool hasHome = false;
-            Navigator.of(context).popUntil((route) {
-              if (route.settings.name == RouteConstants.home ||
-                  route.settings.name == RouteConstants.sessionStart) {
-                hasHome = true;
-                return true;
-              }
-              return false;
-            });
-            if (!hasHome) {
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                RouteConstants.home,
-                (route) => false,
-              );
-            }
-          },
+          onPressed: () => _handleFinishSession(context),
         ),
         const SizedBox(height: AppSpacing.sm),
         TextButton(
-          onPressed: () {
-            bool hasHistory = false;
-            Navigator.of(context).popUntil((route) {
-              if (route.settings.name == RouteConstants.sessionHistory) {
-                hasHistory = true;
-                return true;
-              }
-              return false;
-            });
-            if (!hasHistory) {
-              Navigator.of(context).pushReplacementNamed(RouteConstants.sessionHistory);
-            }
-          },
+          onPressed: () => _handleBackToHistory(context),
           child: const Text(
             AppConstants.backToHistoryButton,
             style: TextStyle(

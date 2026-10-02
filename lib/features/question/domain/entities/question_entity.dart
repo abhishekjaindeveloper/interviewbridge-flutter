@@ -6,6 +6,7 @@ class QuestionEntity extends Equatable {
   final int questionNumber;
   final String question;
   final String? userAnswer;
+  final String? referenceAnswer;
   final String? translatedAnswer;
   final String? improvedAnswer;
   final String? explanation;
@@ -22,6 +23,7 @@ class QuestionEntity extends Equatable {
     required this.questionNumber,
     required this.question,
     this.userAnswer,
+    this.referenceAnswer,
     this.translatedAnswer,
     this.improvedAnswer,
     this.explanation,
@@ -40,6 +42,7 @@ class QuestionEntity extends Equatable {
         questionNumber,
         question,
         userAnswer,
+        referenceAnswer,
         translatedAnswer,
         improvedAnswer,
         explanation,

@@ -11,6 +11,8 @@ class EvaluationModel extends EvaluationEntity {
     super.improvedAnswer,
     super.explanation,
     super.score,
+    super.whatWasCorrect,
+    super.whatWasMissing,
     required super.evaluationStatus,
     super.evaluatedAt,
   });
@@ -26,6 +28,8 @@ class EvaluationModel extends EvaluationEntity {
       improvedAnswer: json['improvedAnswer'] as String?,
       explanation: json['explanation'] as String?,
       score: json['score'] as int?,
+      whatWasCorrect: json['whatWasCorrect'] as String?,
+      whatWasMissing: json['whatWasMissing'] as String?,
       evaluationStatus: json['evaluationStatus'] as String? ?? 'PENDING',
       evaluatedAt: json['evaluatedAt'] != null
           ? DateTime.tryParse(json['evaluatedAt'] as String)
@@ -44,6 +48,8 @@ class EvaluationModel extends EvaluationEntity {
       'improvedAnswer': improvedAnswer,
       'explanation': explanation,
       'score': score,
+      'whatWasCorrect': whatWasCorrect,
+      'whatWasMissing': whatWasMissing,
       'evaluationStatus': evaluationStatus,
       'evaluatedAt': evaluatedAt?.toIso8601String(),
     };
@@ -60,6 +66,8 @@ class EvaluationModel extends EvaluationEntity {
       improvedAnswer: improvedAnswer,
       explanation: explanation,
       score: score,
+      whatWasCorrect: whatWasCorrect,
+      whatWasMissing: whatWasMissing,
       evaluationStatus: evaluationStatus,
       evaluatedAt: evaluatedAt,
     );

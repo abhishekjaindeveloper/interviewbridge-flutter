@@ -10,6 +10,8 @@ class EvaluationEntity extends Equatable {
   final String? improvedAnswer;
   final String? explanation;
   final int? score;
+  final String? whatWasCorrect;
+  final String? whatWasMissing;
   final String evaluationStatus;
   final DateTime? evaluatedAt;
 
@@ -23,6 +25,8 @@ class EvaluationEntity extends Equatable {
     this.improvedAnswer,
     this.explanation,
     this.score,
+    this.whatWasCorrect,
+    this.whatWasMissing,
     required this.evaluationStatus,
     this.evaluatedAt,
   });
@@ -38,6 +42,8 @@ class EvaluationEntity extends Equatable {
         improvedAnswer,
         explanation,
         score,
+        whatWasCorrect,
+        whatWasMissing,
         evaluationStatus,
         evaluatedAt,
       ];

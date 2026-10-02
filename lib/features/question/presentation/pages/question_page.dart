@@ -34,6 +34,7 @@ class _QuestionPageState extends State<QuestionPage> {
   final Map<int, String> _draftAnswers = {};
   int _lastIndex = -1;
   String? _validationError;
+  bool _showReferenceAnswer = false;
 
   @override
   void initState() {
@@ -103,11 +104,13 @@ class _QuestionPageState extends State<QuestionPage> {
             }
 
             if (state.currentIndex != _lastIndex) {
-              // 1. Save draft for the old index (if valid and not answered)
+              _showReferenceAnswer = false;
+
+              // 1. Save draft for the old index (if valid and not evaluated)
               if (_lastIndex >= 0 && _lastIndex < state.questions.length) {
                 final oldQuestion = state.questions[_lastIndex];
-                final isOldAnswered = oldQuestion.questionStatus.toUpperCase() == 'ANSWERED';
-                if (!isOldAnswered) {
+                final isOldEvaluated = oldQuestion.evaluationStatus?.toUpperCase() == 'COMPLETED';
+                if (!isOldEvaluated) {
                   _draftAnswers[_lastIndex] = _answerController.text;
                 }
               }
@@ -115,7 +118,8 @@ class _QuestionPageState extends State<QuestionPage> {
               // 2. Load draft or submitted answer for the new index
               _lastIndex = state.currentIndex;
               final activeQuestion = state.questions[state.currentIndex];
-              if (activeQuestion.questionStatus.toUpperCase() == 'ANSWERED') {
+              final isCurrentEvaluated = activeQuestion.evaluationStatus?.toUpperCase() == 'COMPLETED';
+              if (isCurrentEvaluated) {
                 _answerController.text = activeQuestion.userAnswer ?? '';
               } else {
                 _answerController.text = _draftAnswers[state.currentIndex] ?? activeQuestion.userAnswer ?? '';
@@ -160,6 +164,17 @@ class _QuestionPageState extends State<QuestionPage> {
           }
 
           if (state is QuestionsLoaded) {
+            if (state.currentIndex != _lastIndex) {
+              _showReferenceAnswer = false;
+              _lastIndex = state.currentIndex;
+              final q = state.questions[state.currentIndex];
+              final isEvaluated = q.evaluationStatus?.toUpperCase() == 'COMPLETED';
+              if (isEvaluated) {
+                _answerController.text = q.userAnswer ?? '';
+              } else {
+                _answerController.text = _draftAnswers[state.currentIndex] ?? q.userAnswer ?? '';
+              }
+            }
             final questions = state.questions;
             final currentIndex = state.currentIndex;
             final activeQuestion = questions[currentIndex];
@@ -168,7 +183,7 @@ class _QuestionPageState extends State<QuestionPage> {
             
             final isSubmitting = state is AnswerSubmitting;
             final isCompletedState = state is QuestionCompleted || completed == total;
-            final isQuestionAnswered = activeQuestion.questionStatus.toUpperCase() == 'ANSWERED';
+            final isEvaluationCompleted = activeQuestion.evaluationStatus?.toUpperCase() == 'COMPLETED';
 
             return SafeArea(
               child: SingleChildScrollView(
@@ -221,6 +236,9 @@ class _QuestionPageState extends State<QuestionPage> {
                                 onTap: isSubmitting
                                     ? null
                                     : () {
+                                        setState(() {
+                                          _showReferenceAnswer = false;
+                                        });
                                         context.read<QuestionBloc>().add(NavigateToQuestionRequested(index));
                                       },
                                 borderRadius: BorderRadius.circular(AppDimensions.inputRadius),
@@ -261,11 +279,13 @@ class _QuestionPageState extends State<QuestionPage> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    AppConstants.questionOfTotal(currentIndex + 1, total),
-                                    style: AppTypography.bodyMedium.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.textSecondary,
+                                  Expanded(
+                                    child: Text(
+                                      AppConstants.questionOfTotal(currentIndex + 1, total),
+                                      style: AppTypography.bodyMedium.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.textSecondary,
+                                      ),
                                     ),
                                   ),
                                   QuestionStatusChipWidget(status: activeQuestion.questionStatus),
@@ -285,17 +305,111 @@ class _QuestionPageState extends State<QuestionPage> {
                         const SizedBox(height: AppSpacing.xl),
 
                         AnswerInputWidget(
+                          key: ValueKey('answer_input_${activeQuestion.id}'),
+                          questionId: activeQuestion.id,
                           controller: _answerController,
-                          enabled: !isSubmitting && !isQuestionAnswered,
+                          enabled: !isSubmitting && !isEvaluationCompleted,
                           errorText: _validationError,
                         ),
+
+                        if (activeQuestion.referenceAnswer != null &&
+                            activeQuestion.referenceAnswer!.trim().isNotEmpty) ...[
+                          const SizedBox(height: AppSpacing.md),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: OutlinedButton.icon(
+                              key: const ValueKey('toggle_reference_answer_button'),
+                              onPressed: () {
+                                setState(() {
+                                  _showReferenceAnswer = !_showReferenceAnswer;
+                                });
+                              },
+                              icon: Icon(
+                                _showReferenceAnswer
+                                    ? Icons.visibility_off_outlined
+                                    : Icons.lightbulb_outline_rounded,
+                                size: 18,
+                                color: AppColors.secondary,
+                              ),
+                              label: Text(
+                                _showReferenceAnswer
+                                    ? AppConstants.hideReferenceAnswerTitle
+                                    : AppConstants.showReferenceAnswerTitle,
+                                style: AppTypography.bodyMedium.copyWith(
+                                  color: AppColors.secondary,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(
+                                  color: AppColors.secondary.withOpacity(0.4),
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(AppDimensions.inputRadius),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSpacing.md,
+                                  vertical: AppSpacing.sm,
+                                ),
+                              ),
+                            ),
+                          ),
+                          if (_showReferenceAnswer) ...[
+                            const SizedBox(height: AppSpacing.sm),
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(AppSpacing.lg),
+                              decoration: BoxDecoration(
+                                color: AppColors.surface,
+                                borderRadius: BorderRadius.circular(AppDimensions.cardRadius),
+                                border: Border.all(
+                                  color: AppColors.secondary.withOpacity(0.4),
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.menu_book_rounded,
+                                        color: AppColors.secondary,
+                                        size: 20,
+                                      ),
+                                      const SizedBox(width: AppSpacing.sm),
+                                      Text(
+                                        AppConstants.referenceAnswerTitle,
+                                        style: AppTypography.bodyLarge.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.textPrimary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: AppSpacing.sm),
+                                  Divider(color: AppColors.border, height: 1),
+                                  const SizedBox(height: AppSpacing.md),
+                                  SelectableText(
+                                    activeQuestion.referenceAnswer!,
+                                    style: AppTypography.bodyMedium.copyWith(
+                                      color: AppColors.textPrimary,
+                                      height: 1.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ],
+
                         const SizedBox(height: AppSpacing.xl),
 
                         CustomButton(
-                          text: isQuestionAnswered 
+                          text: isEvaluationCompleted 
                               ? AppConstants.duplicateSubmissionWarning 
                               : AppConstants.submitAnswerButton,
-                          onPressed: (isSubmitting || isQuestionAnswered)
+                          onPressed: (isSubmitting || isEvaluationCompleted)
                               ? null
                               : () => _onSubmitPressed(activeQuestion.id),
                           isLoading: isSubmitting,
@@ -309,6 +423,9 @@ class _QuestionPageState extends State<QuestionPage> {
                               onPressed: (currentIndex == 0 || isSubmitting)
                                   ? null
                                   : () {
+                                      setState(() {
+                                        _showReferenceAnswer = false;
+                                      });
                                       context
                                           .read<QuestionBloc>()
                                           .add(NavigateToQuestionRequested(currentIndex - 1));
@@ -323,6 +440,9 @@ class _QuestionPageState extends State<QuestionPage> {
                               onPressed: (currentIndex == total - 1 || isSubmitting)
                                   ? null
                                   : () {
+                                      setState(() {
+                                        _showReferenceAnswer = false;
+                                      });
                                       context
                                           .read<QuestionBloc>()
                                           .add(NavigateToQuestionRequested(currentIndex + 1));

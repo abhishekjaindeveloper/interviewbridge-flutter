@@ -209,12 +209,25 @@ class AppConstants {
   static const String answerSubmittedToast = 'Answer submitted successfully!';
   static const String proceedToEvaluationPrompt = 'Proceed to view the session evaluations.';
   static const String answerTooLongMsg = 'Answer cannot exceed 5000 characters';
+  static const String showReferenceAnswerTitle = 'Show Reference Answer';
+  static const String hideReferenceAnswerTitle = 'Hide Reference Answer';
+  static const String referenceAnswerTitle = 'Reference Answer';
+
+  // Voice Input Strings
+  static const String startVoiceInputTitle = 'Start voice input';
+  static const String stopVoiceInputTitle = 'Stop voice input';
+  static const String listeningVoiceInputStatus = 'Listening...';
+  static const String speechRecognitionUnavailableMessage = 'Speech recognition is not available on this device';
+  static const String microphonePermissionDeniedMessage = 'Microphone permission was denied';
+  static const String speechRecognitionErrorMessage = 'Speech recognition error occurred';
 
   // Evaluation Screen Strings
   static const String evaluationPageTitle = 'AI Evaluation & Feedback';
   static const String evaluateButton = 'Evaluate Answer';
   static const String evaluatingStatus = 'AI is evaluating your response...';
   static const String userAnswerTitle = 'Your Answer';
+  static const String whatWasCorrectTitle = 'What Was Correct';
+  static const String whatWasMissingTitle = 'What Was Missing';
   static const String translatedAnswerTitle = 'Translated Answer';
   static const String improvedAnswerTitle = 'Suggested Improvement';
   static const String explanationTitle = 'AI Feedback & Explanation';

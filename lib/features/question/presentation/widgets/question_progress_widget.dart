@@ -25,12 +25,16 @@ class QuestionProgressWidget extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              AppConstants.completedQuestionsProgressLabel,
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
+            Expanded(
+              child: Text(
+                AppConstants.completedQuestionsProgressLabel,
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
+            const SizedBox(width: AppSpacing.sm),
             Text(
               '$completedQuestions / $totalQuestions',
               style: AppTypography.bodyMedium.copyWith(
